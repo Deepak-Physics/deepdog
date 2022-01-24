@@ -69,7 +69,7 @@ class Diagnostic():
 					row = {
 						"model": name,
 						"index": idx,
-						"bounds_px": bounds,
+						"bounds": bounds,
 						"actual_dipole_moment": self.dipoles.dipoles[0].p,
 						"actual_dipole_position": self.dipoles.dipoles[0].s,
 						"actual_dipole_freq": self.dipoles.dipoles[0].w,
