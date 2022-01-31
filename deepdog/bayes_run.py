@@ -41,7 +41,7 @@ class BayesRun():
 	run_count: int
 		The number of runs to do.
 	'''
-	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int) -> None:
+	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int, max_frequency: float = None) -> None:
 		self.dot_inputs = dot_inputs
 		self.discretisations = [disc for (_, disc) in discretisations_with_names]
 		self.model_names = [name for (name, _) in discretisations_with_names]
@@ -58,6 +58,7 @@ class BayesRun():
 
 		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 		self.filename = f"{timestamp}-{filename_slug}.csv"
+		self.max_frequency = max_frequency
 
 	def go(self) -> None:
 		with open(self.filename, "a", newline="") as outfile:
@@ -65,7 +66,11 @@ class BayesRun():
 			writer.writeheader()
 
 		for run in range(1, self.run_count + 1):
-			dipoles = self.actual_model.get_dipoles(run)
+			frequency: float = run
+			if self.max_frequency is not None and self.max_frequency > 1:
+				rng = numpy.random.default_rng()
+				frequency = rng.uniform(1, self.max_frequency)
+			dipoles = self.actual_model.get_dipoles(frequency)
 
 			dots = dipoles.get_dot_measurements(self.dot_inputs)
 			_logger.info(f"Going to work on dipole at {dipoles.dipoles}")
