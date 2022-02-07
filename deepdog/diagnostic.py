@@ -91,7 +91,7 @@ class Diagnostic():
 					bounds = discretisation.bounds(idx)
 
 					actual_success = result.success and result.cost <= 1e-10
-					diag_row = SingleDipoleDiagnostic(name, idx, bounds, self.dipoles.dipoles[0], discretisation.model.solution_as_dipoles(result.normalised_x), actual_success)
+					diag_row = SingleDipoleDiagnostic(name, idx, bounds, self.dipoles.dipoles[0], discretisation.model.solution_as_dipoles(result.normalised_x)[0], actual_success)
 					row = vars(diag_row)
 					_logger.debug(f"Writing result {row}")
 					writer.writerow(row)
