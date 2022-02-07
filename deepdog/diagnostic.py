@@ -84,7 +84,7 @@ class Diagnostic():
 				results = pool.starmap(get_a_result, zip(itertools.repeat(discretisation), itertools.repeat(self.dots), discretisation.all_indices()))
 
 			with open(self.filename, "a", newline='') as outfile:
-				writer = csv.DictWriter(outfile, fieldnames=self.csv_fields, dialect='unix')
+				writer = csv.DictWriter(outfile, fieldnames=self.csv_fields, dialect='unix', extrasaction="ignore")
 
 				for idx, result in results:
 
