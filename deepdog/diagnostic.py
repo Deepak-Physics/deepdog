@@ -41,7 +41,6 @@ class SingleDipoleDiagnostic():
 		self.s_result_z = self.result_dipole.s[2]
 		self.w_actual = self.actual_dipole.w
 		self.w_result = self.result_dipole.w
-		
 
 
 class Diagnostic():
