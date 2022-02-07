@@ -39,6 +39,9 @@ class SingleDipoleDiagnostic():
 		self.s_result_x = self.result_dipole.s[0]
 		self.s_result_y = self.result_dipole.s[1]
 		self.s_result_z = self.result_dipole.s[2]
+		self.w_actual = self.actual_dipole.w
+		self.w_result = self.result_dipole.w
+		
 
 
 class Diagnostic():
@@ -65,7 +68,7 @@ class Diagnostic():
 		self.discretisations_with_names = discretisations_with_names
 		self.model_count = len(self.discretisations_with_names)
 
-		self.csv_fields = ["model", "index", "bounds", "p_actual_x", "p_actual_y", "p_actual_z", "s_actual_x", "s_actual_y", "s_actual_z", "actual_dipole_freq", "success", "p_result_x", "p_result_y", "p_result_z", "s_result_x", "s_result_y", "s_result_z"]
+		self.csv_fields = ["model", "index", "bounds", "p_actual_x", "p_actual_y", "p_actual_z", "s_actual_x", "s_actual_y", "s_actual_z", "w_actual", "success", "p_result_x", "p_result_y", "p_result_z", "s_result_x", "s_result_y", "s_result_z", "w_result"]
 
 		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 		self.filename = f"{timestamp}-{filename_slug}.diag.csv"
