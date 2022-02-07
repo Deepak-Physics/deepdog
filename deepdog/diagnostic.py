@@ -3,6 +3,7 @@ import pdme
 from deepdog.bayes_run import DotInput
 import datetime
 import numpy
+from dataclasses import dataclass
 import logging
 from typing import Sequence, Tuple
 import csv
@@ -14,6 +15,30 @@ _logger = logging.getLogger(__name__)
 
 def get_a_result(discretisation, dots, index):
 	return (index, discretisation.solve_for_index(dots, index))
+
+
+@dataclass
+class SingleDipoleDiagnostic():
+	model: str
+	index: Tuple
+	bounds: Tuple
+	actual_dipole: OscillatingDipole
+	result_dipole: OscillatingDipole
+	success: bool
+
+	def __post_init__(self) -> None:
+		self.p_actual_x = self.actual_dipole.p[0]
+		self.p_actual_y = self.actual_dipole.p[1]
+		self.p_actual_z = self.actual_dipole.p[2]
+		self.s_actual_x = self.actual_dipole.s[0]
+		self.s_actual_y = self.actual_dipole.s[1]
+		self.s_actual_z = self.actual_dipole.s[2]
+		self.p_result_x = self.result_dipole.p[0]
+		self.p_result_y = self.result_dipole.p[1]
+		self.p_result_z = self.result_dipole.p[2]
+		self.s_result_x = self.result_dipole.s[0]
+		self.s_result_y = self.result_dipole.s[1]
+		self.s_result_z = self.result_dipole.s[2]
 
 
 class Diagnostic():
@@ -40,10 +65,10 @@ class Diagnostic():
 		self.discretisations_with_names = discretisations_with_names
 		self.model_count = len(self.discretisations_with_names)
 
-		self.csv_fields = ["model", "index", "bounds", "actual_dipole_moment", "actual_dipole_position", "actual_dipole_freq", "success", "result"]
+		self.csv_fields = ["model", "index", "bounds", "p_actual_x", "p_actual_y", "p_actual_z", "s_actual_x", "s_actual_y", "s_actual_z", "actual_dipole_freq", "success", "p_result_x", "p_result_y", "p_result_z", "s_result_x", "s_result_y", "s_result_z"]
 
 		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-		self.filename = f"{timestamp}-{filename_slug}.csv"
+		self.filename = f"{timestamp}-{filename_slug}.diag.csv"
 
 	def go(self):
 		with open(self.filename, "a", newline="") as outfile:
@@ -66,15 +91,7 @@ class Diagnostic():
 					bounds = discretisation.bounds(idx)
 
 					actual_success = result.success and result.cost <= 1e-10
-					row = {
-						"model": name,
-						"index": idx,
-						"bounds": bounds,
-						"actual_dipole_moment": self.dipoles.dipoles[0].p,
-						"actual_dipole_position": self.dipoles.dipoles[0].s,
-						"actual_dipole_freq": self.dipoles.dipoles[0].w,
-						"success": actual_success,
-						"result": result.normalised_x if actual_success else None,
-					}
+					diag_row = SingleDipoleDiagnostic(name, idx, bounds, self.dipoles.dipoles[0], discretisation.model.solution_as_dipoles(result.normalised_x), actual_success)
+					row = vars(diag_row)
 					_logger.debug(f"Writing result {row}")
 					writer.writerow(row)
