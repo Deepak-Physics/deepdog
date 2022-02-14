@@ -95,7 +95,8 @@ class BayesRun():
 				"dipole_location": dipoles.dipoles[0].s,
 				"dipole_frequency": dipoles.dipoles[0].w
 			}
-			successes: List[int] = []
+			successes: List[float] = []
+			counts: List[int] = []
 			for model_index, (name, result) in enumerate(zip(self.model_names, results)):
 				count = 0
 				success = 0
@@ -106,10 +107,11 @@ class BayesRun():
 
 				row[f"{name}_success"] = success
 				row[f"{name}_count"] = count
-				successes.append(max(success, 1))
+				successes.append(max(success, 0.5))
+				counts.append(count)
 
-			success_weight = sum([succ * prob for succ, prob in zip(successes, self.probabilities)])
-			new_probabilities = [succ * old_prob / success_weight for succ, old_prob in zip(successes, self.probabilities)]
+			success_weight = sum([(succ / count) * prob for succ, count, prob in zip(successes, counts, self.probabilities)])
+			new_probabilities = [(succ / count) * old_prob / success_weight for succ, count, old_prob in zip(successes, counts, self.probabilities)]
 			self.probabilities = new_probabilities
 			for name, probability in zip(self.model_names, self.probabilities):
 				row[f"{name}_prob"] = probability
