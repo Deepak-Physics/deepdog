@@ -13,6 +13,7 @@ pytest = ">=6"
 flake8 = "^4.0.1"
 pytest-cov = "^3.0.0"
 mypy = "^0.931"
+python-semantic-release = "^7.24.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -35,3 +36,4 @@ ignore_missing_imports = true
 
 [tool.semantic_release]
 version_toml = "pyproject.toml:tool.poetry.version"
+tag_format = "{version}"
