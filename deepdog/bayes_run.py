@@ -63,7 +63,7 @@ class BayesRun():
 			if 0 < end_threshold < 1:
 				self.end_threshold: float = end_threshold
 				self.use_end_threshold = True
-				_logger.info("Will abort early, at {self.end_threshold}.")
+				_logger.info(f"Will abort early, at {self.end_threshold}.")
 			else:
 				raise ValueError(f"end_threshold should be between 0 and 1, but is actually {end_threshold}")
 
