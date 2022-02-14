@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "deepdog"
-version = "0.2.4"
+version = "0.3.0"
 description = ""
 authors = ["Deepak Mallubhotla <dmallubhotla+github@gmail.com>"]
 
@@ -32,3 +32,6 @@ module = [
 	"scipy.optimize"
 ]
 ignore_missing_imports = true
+
+[tool.semantic_release]
+version_toml = "pyproject.toml:tool.poetry.version"
