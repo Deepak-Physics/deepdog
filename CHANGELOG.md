@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.3](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.2...0.3.3) (2022-03-06)
+
+
+### Bug Fixes
+
+* Fixes count to use cycles as well ([8617e4d](https://gitea.deepak.science:2222/physics/deepdog/commit/8617e4d2742b112cc824068150682ce3b2cdd879))
+
 ### [0.3.2](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.1...0.3.2) (2022-03-06)
 
 
