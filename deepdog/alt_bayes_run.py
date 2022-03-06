@@ -112,9 +112,9 @@ class AltBayesRun():
 			for model_index, (name, result) in enumerate(zip(self.model_names, results)):
 
 				row[f"{name}_success"] = result
-				row[f"{name}_count"] = self.monte_carlo_count
+				row[f"{name}_count"] = self.monte_carlo_count * self.monte_carlo_cycles
 				successes.append(max(result, 0.5))
-				counts.append(self.monte_carlo_count)
+				counts.append(self.monte_carlo_count * self.monte_carlo_cycles)
 
 			success_weight = sum([(succ / count) * prob for succ, count, prob in zip(successes, counts, self.probabilities)])
 			new_probabilities = [(succ / count) * old_prob / success_weight for succ, count, old_prob in zip(successes, counts, self.probabilities)]
