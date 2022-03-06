@@ -4,6 +4,7 @@ import pdme.util.fast_v_calc
 from typing import Sequence, Tuple, List
 import datetime
 import csv
+import multiprocessing
 import logging
 import numpy
 
@@ -17,6 +18,13 @@ DotInput = Tuple[numpy.typing.ArrayLike, float]
 
 
 _logger = logging.getLogger(__name__)
+
+
+def get_a_result(input) -> int:
+	discretisation, dot_inputs, lows, highs, monte_carlo_count, max_frequency = input
+	sample_dipoles = discretisation.get_model().get_n_single_dipoles(monte_carlo_count, max_frequency)
+	vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
+	return numpy.count_nonzero(pdme.util.fast_v_calc.between(vals, lows, highs))
 
 
 class AltBayesRun():
@@ -36,7 +44,7 @@ class AltBayesRun():
 	run_count: int
 		The number of runs to do.
 	'''
-	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int, low_error: float = 0.9, high_error: float = 1.1, monte_carlo_count: int = 10000, max_frequency: float = 20, end_threshold: float = None) -> None:
+	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int, low_error: float = 0.9, high_error: float = 1.1, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None) -> None:
 		self.dot_inputs = dot_inputs
 		self.dot_inputs_array = pdme.measurement.oscillating_dipole.dot_inputs_to_array(dot_inputs)
 		self.discretisations = [disc for (_, disc) in discretisations_with_names]
@@ -44,6 +52,7 @@ class AltBayesRun():
 		self.actual_model = actual_model
 		self.model_count = len(self.discretisations)
 		self.monte_carlo_count = monte_carlo_count
+		self.monte_carlo_cycles = monte_carlo_cycles
 		self.run_count = run_count
 		self.low_error = low_error
 		self.high_error = high_error
@@ -87,9 +96,10 @@ class AltBayesRun():
 			_logger.debug("Going to iterate over discretisations now")
 			for disc_count, discretisation in enumerate(self.discretisations):
 				_logger.debug(f"Doing discretisation #{disc_count}")
-				sample_dipoles = discretisation.get_model().get_n_single_dipoles(self.monte_carlo_count, self.max_frequency)
-				vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(self.dot_inputs_array, sample_dipoles)
-				results.append(numpy.count_nonzero(pdme.util.fast_v_calc.between(vals, lows, highs)))
+				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
+					results.append(sum(
+						pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles)
+					))
 
 			_logger.debug("Done, constructing output now")
 			row = {
