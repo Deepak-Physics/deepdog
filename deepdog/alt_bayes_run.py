@@ -10,8 +10,7 @@ import numpy
 
 
 # TODO: remove hardcode
-COST_THRESHOLD = 1e-10
-
+CHUNKSIZE = 20
 
 # TODO: It's garbage to have this here duplicated from pdme.
 DotInput = Tuple[numpy.typing.ArrayLike, float]
@@ -98,7 +97,7 @@ class AltBayesRun():
 				_logger.debug(f"Doing discretisation #{disc_count}")
 				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
 					results.append(sum(
-						pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles)
+						pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, CHUNKSIZE)
 					))
 
 			_logger.debug("Done, constructing output now")
