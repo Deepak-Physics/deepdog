@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.2](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.1...0.3.2) (2022-03-06)
+
+
+### Features
+
+* Adds monte carlo cycles to trade off space and cpu ([e6d8d33](https://gitea.deepak.science:2222/physics/deepdog/commit/e6d8d33c27e7922581e91c10de4f5faff2a51f8b))
+
 ### [0.3.1](https://gitea.deepak.science:2222/physics/deepdog/compare/v0.3.0...v0.3.1) (2022-03-06)
 
 
