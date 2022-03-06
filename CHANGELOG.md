@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.4](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.3...0.3.4) (2022-03-06)
+
+
+### Features
+
+* Changes chunksize for multiprocessing ([0784cd5](https://gitea.deepak.science:2222/physics/deepdog/commit/0784cd53d79e00684506604f094b5d820b3994d4))
+
 ### [0.3.3](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.2...0.3.3) (2022-03-06)
 
 
