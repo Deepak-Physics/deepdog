@@ -6,7 +6,7 @@ authors = ["Deepak Mallubhotla <dmallubhotla+github@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.10"
-pdme = "^0.5.3"
+pdme = "^0.5.4"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=6"
