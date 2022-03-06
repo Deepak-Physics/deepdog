@@ -16,6 +16,10 @@ test() {
    poetry run pytest
 }
 
+release() {
+   ./scripts/release.sh
+}
+
 htmlcov() {
 	poetry run pytest --cov-report=html
 }
