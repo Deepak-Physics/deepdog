@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.5](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.4...0.3.5) (2022-03-07)
+
+
+### Features
+
+* makes chunksize configurable ([88d9613](https://gitea.deepak.science:2222/physics/deepdog/commit/88d961313c1db0d49fd96939aa725a8706fa0412))
+
 ### [0.3.4](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.3...0.3.4) (2022-03-06)
 
 
