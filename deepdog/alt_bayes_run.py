@@ -10,7 +10,7 @@ import numpy
 
 
 # TODO: remove hardcode
-CHUNKSIZE = 20
+CHUNKSIZE = 50
 
 # TODO: It's garbage to have this here duplicated from pdme.
 DotInput = Tuple[numpy.typing.ArrayLike, float]
@@ -43,7 +43,7 @@ class AltBayesRun():
 	run_count: int
 		The number of runs to do.
 	'''
-	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int, low_error: float = 0.9, high_error: float = 1.1, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None) -> None:
+	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int, low_error: float = 0.9, high_error: float = 1.1, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None, chunksize: int = CHUNKSIZE) -> None:
 		self.dot_inputs = dot_inputs
 		self.dot_inputs_array = pdme.measurement.oscillating_dipole.dot_inputs_to_array(dot_inputs)
 		self.discretisations = [disc for (_, disc) in discretisations_with_names]
@@ -57,6 +57,7 @@ class AltBayesRun():
 		self.high_error = high_error
 		self.csv_fields = ["dipole_moment", "dipole_location", "dipole_frequency"]
 		self.compensate_zeros = True
+		self.chunksize = chunksize
 		for name in self.model_names:
 			self.csv_fields.extend([f"{name}_success", f"{name}_count", f"{name}_prob"])
 
@@ -97,7 +98,7 @@ class AltBayesRun():
 				_logger.debug(f"Doing discretisation #{disc_count}")
 				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
 					results.append(sum(
-						pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, CHUNKSIZE)
+						pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
 					))
 
 			_logger.debug("Done, constructing output now")
