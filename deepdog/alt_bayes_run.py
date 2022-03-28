@@ -57,7 +57,7 @@ class AltBayesRun():
 	run_count: int
 		The number of runs to do.
 	'''
-	def __init__(self, dot_positions: Sequence[numpy.typing.ArrayLike], frequency_range: Sequence[float], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int = 100, low_error: float = 0.9, high_error: float = 1.1, pairs_high_error=None, pairs_low_error=None, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None, chunksize: int = CHUNKSIZE, use_pairs: bool = False) -> None:
+	def __init__(self, dot_positions: Sequence[numpy.typing.ArrayLike], frequency_range: Sequence[float], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int = 100, low_error: float = 0.9, high_error: float = 1.1, pairs_high_error=None, pairs_low_error=None, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, target_success: int = 100, max_monte_carlo_cycles_steps: int = 10, max_frequency: float = 20, end_threshold: float = None, chunksize: int = CHUNKSIZE, use_pairs: bool = False) -> None:
 		self.dot_inputs = pdme.inputs.inputs_with_frequency_range(dot_positions, frequency_range)
 		self.dot_inputs_array = pdme.measurement.input_types.dot_inputs_to_array(self.dot_inputs)
 
@@ -72,6 +72,8 @@ class AltBayesRun():
 		self.model_count = len(self.discretisations)
 		self.monte_carlo_count = monte_carlo_count
 		self.monte_carlo_cycles = monte_carlo_cycles
+		self.target_success = target_success
+		self.max_monte_carlo_cycles_steps = max_monte_carlo_cycles_steps
 		self.run_count = run_count
 		self.low_error = low_error
 		self.high_error = high_error
@@ -134,14 +136,25 @@ class AltBayesRun():
 			for disc_count, discretisation in enumerate(self.discretisations):
 				_logger.debug(f"Doing discretisation #{disc_count}")
 				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
-					if self.use_pairs:
-						results.append(sum(
-							pool.imap_unordered(get_a_result_using_pairs, [(discretisation, self.dot_inputs_array, self.dot_pair_inputs_array, lows, highs, pair_lows, pair_highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
-						))
-					else:
-						results.append(sum(
-							pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
-						))
+					cycle_count = 0
+					cycle_success = 0
+					cycles = 0
+					while (cycles < self.max_monte_carlo_cycles_steps) and (cycle_success <= self.target_success):
+						_logger.debug(f"Starting cycle {cycles}")
+						cycles += 1
+						current_success = 0
+						cycle_count += self.monte_carlo_count * self.monte_carlo_cycles
+						if self.use_pairs:
+							current_success = sum(
+								pool.imap_unordered(get_a_result_using_pairs, [(discretisation, self.dot_inputs_array, self.dot_pair_inputs_array, lows, highs, pair_lows, pair_highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
+							)
+						else:
+							current_success = sum(
+								pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
+							)
+						
+						cycle_success += current_success
+					results.append((cycle_count, cycle_success))
 
 			_logger.debug("Done, constructing output now")
 			row = {
@@ -151,12 +164,12 @@ class AltBayesRun():
 			}
 			successes: List[float] = []
 			counts: List[int] = []
-			for model_index, (name, result) in enumerate(zip(self.model_names, results)):
+			for model_index, (name, (count, result)) in enumerate(zip(self.model_names, results)):
 
 				row[f"{name}_success"] = result
-				row[f"{name}_count"] = self.monte_carlo_count * self.monte_carlo_cycles
+				row[f"{name}_count"] = count
 				successes.append(max(result, 0.5))
-				counts.append(self.monte_carlo_count * self.monte_carlo_cycles)
+				counts.append(count)
 
 			success_weight = sum([(succ / count) * prob for succ, count, prob in zip(successes, counts, self.probabilities)])
 			new_probabilities = [(succ / count) * old_prob / success_weight for succ, count, old_prob in zip(successes, counts, self.probabilities)]
