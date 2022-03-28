@@ -1,6 +1,9 @@
+import pdme.inputs
 import pdme.model
+import pdme.measurement.input_types
 import pdme.measurement.oscillating_dipole
 import pdme.util.fast_v_calc
+import pdme.util.fast_nonlocal_spectrum
 from typing import Sequence, Tuple, List
 import datetime
 import csv
@@ -26,6 +29,17 @@ def get_a_result(input) -> int:
 	return numpy.count_nonzero(pdme.util.fast_v_calc.between(vals, lows, highs))
 
 
+def get_a_result_using_pairs(input) -> int:
+	discretisation, dot_inputs, pair_inputs, local_lows, local_highs, nonlocal_lows, nonlocal_highs, monte_carlo_count, max_frequency = input
+	sample_dipoles = discretisation.get_model().get_n_single_dipoles(monte_carlo_count, max_frequency)
+	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
+	local_matches = pdme.util.fast_v_calc.between(local_vals, local_lows, local_highs)
+	nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal(pair_inputs, sample_dipoles)
+	nonlocal_matches = pdme.util.fast_v_calc.between(nonlocal_vals, nonlocal_lows, nonlocal_highs)
+	combined_matches = numpy.logical_and(local_matches, nonlocal_matches)
+	return numpy.count_nonzero(combined_matches)
+
+
 class AltBayesRun():
 	'''
 	A single Bayes run for a given set of dots.
@@ -43,9 +57,15 @@ class AltBayesRun():
 	run_count: int
 		The number of runs to do.
 	'''
-	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int, low_error: float = 0.9, high_error: float = 1.1, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None, chunksize: int = CHUNKSIZE) -> None:
-		self.dot_inputs = dot_inputs
-		self.dot_inputs_array = pdme.measurement.oscillating_dipole.dot_inputs_to_array(dot_inputs)
+	def __init__(self, dot_positions: Sequence[numpy.typing.ArrayLike], frequency_range: Sequence[float], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int = 100, low_error: float = 0.9, high_error: float = 1.1, pairs_high_error = None, pairs_low_error = None, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None, chunksize: int = CHUNKSIZE, use_pairs: bool = False) -> None:
+		self.dot_inputs = pdme.inputs.inputs_with_frequency_range(dot_positions, frequency_range)
+		self.dot_inputs_array = pdme.measurement.input_types.dot_inputs_to_array(self.dot_inputs)
+
+		self.use_pairs = use_pairs
+
+		self.dot_pair_inputs = pdme.inputs.input_pairs_with_frequency_range(dot_positions, frequency_range)
+		self.dot_pair_inputs_array = pdme.measurement.input_types.dot_pair_inputs_to_array(self.dot_pair_inputs)
+
 		self.discretisations = [disc for (_, disc) in discretisations_with_names]
 		self.model_names = [name for (name, _) in discretisations_with_names]
 		self.actual_model = actual_model
@@ -55,6 +75,14 @@ class AltBayesRun():
 		self.run_count = run_count
 		self.low_error = low_error
 		self.high_error = high_error
+		if pairs_low_error is None:
+			self.pairs_low_error = self.low_error
+		else:
+			self.pairs_low_error = pairs_low_error
+		if pairs_high_error is None:
+			self.pairs_high_error = self.high_error
+		else:
+			self.pairs_high_error = pairs_high_error
 		self.csv_fields = ["dipole_moment", "dipole_location", "dipole_frequency"]
 		self.compensate_zeros = True
 		self.chunksize = chunksize
@@ -64,7 +92,10 @@ class AltBayesRun():
 		self.probabilities = [1 / self.model_count] * self.model_count
 
 		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-		self.filename = f"{timestamp}-{filename_slug}.altbayes.csv"
+		if self.use_pairs:
+			self.filename = f"{timestamp}-{filename_slug}.altbayes.pairs.csv"
+		else:
+			self.filename = f"{timestamp}-{filename_slug}.altbayes.csv"
 		self.max_frequency = max_frequency
 
 		if end_threshold is not None:
@@ -89,7 +120,13 @@ class AltBayesRun():
 			actual_dipoles = self.actual_model.get_dipoles(frequency)
 
 			dots = actual_dipoles.get_percent_range_dot_measurements(self.dot_inputs, self.low_error, self.high_error)
-			lows, highs = pdme.measurement.oscillating_dipole.dot_range_measurements_low_high_arrays(dots)
+			lows, highs = pdme.measurement.input_types.dot_range_measurements_low_high_arrays(dots)
+
+			pair_lows, pair_highs = (None, None)
+			if self.use_pairs:
+				pair_measurements = actual_dipoles.get_percent_range_dot_pair_measurements(self.dot_pair_inputs, self.pairs_low_error, self.pairs_high_error)
+				pair_lows, pair_highs = pdme.measurement.input_types.dot_range_measurements_low_high_arrays(pair_measurements)
+
 			_logger.info(f"Going to work on dipole at {actual_dipoles.dipoles}")
 
 			results = []
@@ -97,9 +134,14 @@ class AltBayesRun():
 			for disc_count, discretisation in enumerate(self.discretisations):
 				_logger.debug(f"Doing discretisation #{disc_count}")
 				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
-					results.append(sum(
-						pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
-					))
+					if self.use_pairs:
+						results.append(sum(
+							pool.imap_unordered(get_a_result_using_pairs, [(discretisation, self.dot_inputs_array, self.dot_pair_inputs_array, lows, highs, pair_lows, pair_highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
+						))
+					else:
+						results.append(sum(
+							pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
+						))
 
 			_logger.debug("Done, constructing output now")
 			row = {
