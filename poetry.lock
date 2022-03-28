@@ -304,7 +304,7 @@ pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 
 [[package]]
 name = "pdme"
-version = "0.6.0"
+version = "0.6.1"
 description = "Python dipole model evaluator"
 category = "main"
 optional = false
@@ -697,7 +697,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.10"
-content-hash = "b70066bcf7d66ae8156df30babbe85c6e60b914da41ed5d7af1054c24897051d"
+content-hash = "0546bcb3bf153a2fa1db53c87dd6a082242b4b5279650601a9cc2e87efa01581"
 
 [metadata.files]
 atomicwrites = [
@@ -952,8 +952,8 @@ packaging = [
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
 ]
 pdme = [
-    {file = "pdme-0.6.0-py3-none-any.whl", hash = "sha256:eb06864332768e96e3729cb9c08231f46994c928246d3148782537ace02a50f1"},
-    {file = "pdme-0.6.0.tar.gz", hash = "sha256:b2955c3ef4951e168d5298cee2e04d57b7bd069454c0815d7e8997f63a44c0c4"},
+    {file = "pdme-0.6.1-py3-none-any.whl", hash = "sha256:c73edeeab13a5518a016f5ac1fdf576f328030530a49991ec822f0ca0c311ff3"},
+    {file = "pdme-0.6.1.tar.gz", hash = "sha256:c857a905d5fbc03ac24777d8fd652e1c5531d0817088748ce443ad1b378124f9"},
 ]
 pkginfo = [
     {file = "pkginfo-1.8.2-py2.py3-none-any.whl", hash = "sha256:c24c487c6a7f72c66e816ab1796b96ac6c3d14d49338293d2141664330b55ffc"},
