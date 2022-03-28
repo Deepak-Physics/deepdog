@@ -57,7 +57,7 @@ class AltBayesRun():
 	run_count: int
 		The number of runs to do.
 	'''
-	def __init__(self, dot_positions: Sequence[numpy.typing.ArrayLike], frequency_range: Sequence[float], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int = 100, low_error: float = 0.9, high_error: float = 1.1, pairs_high_error = None, pairs_low_error = None, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None, chunksize: int = CHUNKSIZE, use_pairs: bool = False) -> None:
+	def __init__(self, dot_positions: Sequence[numpy.typing.ArrayLike], frequency_range: Sequence[float], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int = 100, low_error: float = 0.9, high_error: float = 1.1, pairs_high_error=None, pairs_low_error=None, monte_carlo_count: int = 10000, monte_carlo_cycles: int = 10, max_frequency: float = 20, end_threshold: float = None, chunksize: int = CHUNKSIZE, use_pairs: bool = False) -> None:
 		self.dot_inputs = pdme.inputs.inputs_with_frequency_range(dot_positions, frequency_range)
 		self.dot_inputs_array = pdme.measurement.input_types.dot_inputs_to_array(self.dot_inputs)
 
