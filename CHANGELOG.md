@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.5...0.4.0) (2022-04-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* Adds pair calculations, with changing api format
+
+### Features
+
+* Adds dynamic cycle count increases to help reach minimum success count ([ec7b4ca](https://gitea.deepak.science:2222/physics/deepdog/commit/ec7b4cac393c15e94c513215c4f1ba32be2ae87a))
+* Adds pair calculations, with changing api format ([6463b13](https://gitea.deepak.science:2222/physics/deepdog/commit/6463b135ef2d212b565864b5ac1b655e014d2194))
+
+
+### Bug Fixes
+
+* uses bigfix from pdme for negatives ([c1c711f](https://gitea.deepak.science:2222/physics/deepdog/commit/c1c711f47b574d3a9b8a24dbcbdd7f50b9be8ea9))
+
 ### [0.3.5](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.4...0.3.5) (2022-03-07)
 
 
