@@ -152,7 +152,7 @@ class AltBayesRun():
 							current_success = sum(
 								pool.imap_unordered(get_a_result, [(discretisation, self.dot_inputs_array, lows, highs, self.monte_carlo_count, self.max_frequency)] * self.monte_carlo_cycles, self.chunksize)
 							)
-						
+
 						cycle_success += current_success
 					results.append((cycle_count, cycle_success))
 
