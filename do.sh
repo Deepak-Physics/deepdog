@@ -16,6 +16,11 @@ test() {
    poetry run pytest
 }
 
+fmt() {
+	poetry run black .
+	find . -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
+}
+
 release() {
    ./scripts/release.sh
 }
