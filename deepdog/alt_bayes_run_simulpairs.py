@@ -58,15 +58,15 @@ class AltBayesRunSimulPairs:
 	Parameters
 	----------
 	dot_inputs : Sequence[DotInput]
-			The dot inputs for this bayes run.
+					The dot inputs for this bayes run.
 	discretisations_with_names : Sequence[Tuple(str, pdme.model.Model)]
-			The models to evaluate.
+					The models to evaluate.
 	actual_model_discretisation : pdme.model.Discretisation
-			The discretisation for the model which is actually correct.
+					The discretisation for the model which is actually correct.
 	filename_slug : str
-			The filename slug to include.
+					The filename slug to include.
 	run_count: int
-			The number of runs to do.
+					The number of runs to do.
 	"""
 
 	def __init__(
@@ -206,26 +206,28 @@ class AltBayesRunSimulPairs:
 						current_success_no_pairs = 0
 						cycle_count += self.monte_carlo_count * self.monte_carlo_cycles
 
-						current_success_both = numpy.array(sum(
-							pool.imap_unordered(
-								get_a_simul_result_using_pairs,
-								[
-									(
-										discretisation,
-										self.dot_inputs_array,
-										self.dot_pair_inputs_array,
-										lows,
-										highs,
-										pair_lows,
-										pair_highs,
-										self.monte_carlo_count,
-										self.max_frequency,
-									)
-								]
-								* self.monte_carlo_cycles,
-								self.chunksize,
+						current_success_both = numpy.array(
+							sum(
+								pool.imap_unordered(
+									get_a_simul_result_using_pairs,
+									[
+										(
+											discretisation,
+											self.dot_inputs_array,
+											self.dot_pair_inputs_array,
+											lows,
+											highs,
+											pair_lows,
+											pair_highs,
+											self.monte_carlo_count,
+											self.max_frequency,
+										)
+									]
+									* self.monte_carlo_cycles,
+									self.chunksize,
+								)
 							)
-						))
+						)
 						current_success_no_pairs = current_success_both[0]
 						current_success_pairs = current_success_both[1]
 

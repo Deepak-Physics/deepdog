@@ -20,28 +20,40 @@ DotInput = Tuple[numpy.typing.ArrayLike, float]
 _logger = logging.getLogger(__name__)
 
 
-def get_a_result(discretisation, dots, index) -> Tuple[Tuple[int, ...], scipy.optimize.OptimizeResult]:
+def get_a_result(
+	discretisation, dots, index
+) -> Tuple[Tuple[int, ...], scipy.optimize.OptimizeResult]:
 	return (index, discretisation.solve_for_index(dots, index))
 
 
-class BayesRun():
-	'''
+class BayesRun:
+	"""
 	A single Bayes run for a given set of dots.
 
 	Parameters
 	----------
 	dot_inputs : Sequence[DotInput]
-		The dot inputs for this bayes run.
+			The dot inputs for this bayes run.
 	discretisations_with_names : Sequence[Tuple(str, pdme.model.Model)]
-		The models to evaluate.
+			The models to evaluate.
 	actual_model_discretisation : pdme.model.Discretisation
-		The discretisation for the model which is actually correct.
+			The discretisation for the model which is actually correct.
 	filename_slug : str
-		The filename slug to include.
+			The filename slug to include.
 	run_count: int
-		The number of runs to do.
-	'''
-	def __init__(self, dot_inputs: Sequence[DotInput], discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]], actual_model: pdme.model.Model, filename_slug: str, run_count: int, max_frequency: float = None, end_threshold: float = None) -> None:
+			The number of runs to do.
+	"""
+
+	def __init__(
+		self,
+		dot_inputs: Sequence[DotInput],
+		discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]],
+		actual_model: pdme.model.Model,
+		filename_slug: str,
+		run_count: int,
+		max_frequency: float = None,
+		end_threshold: float = None,
+	) -> None:
 		self.dot_inputs = dot_inputs
 		self.discretisations = [disc for (_, disc) in discretisations_with_names]
 		self.model_names = [name for (name, _) in discretisations_with_names]
@@ -65,7 +77,9 @@ class BayesRun():
 				self.use_end_threshold = True
 				_logger.info(f"Will abort early, at {self.end_threshold}.")
 			else:
-				raise ValueError(f"end_threshold should be between 0 and 1, but is actually {end_threshold}")
+				raise ValueError(
+					f"end_threshold should be between 0 and 1, but is actually {end_threshold}"
+				)
 
 	def go(self) -> None:
 		with open(self.filename, "a", newline="") as outfile:
@@ -87,17 +101,28 @@ class BayesRun():
 			for disc_count, discretisation in enumerate(self.discretisations):
 				_logger.debug(f"Doing discretisation #{disc_count}")
 				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
-					results.append(pool.starmap(get_a_result, zip(itertools.repeat(discretisation), itertools.repeat(dots), discretisation.all_indices())))
+					results.append(
+						pool.starmap(
+							get_a_result,
+							zip(
+								itertools.repeat(discretisation),
+								itertools.repeat(dots),
+								discretisation.all_indices(),
+							),
+						)
+					)
 
 			_logger.debug("Done, constructing output now")
 			row = {
 				"dipole_moment": dipoles.dipoles[0].p,
 				"dipole_location": dipoles.dipoles[0].s,
-				"dipole_frequency": dipoles.dipoles[0].w
+				"dipole_frequency": dipoles.dipoles[0].w,
 			}
 			successes: List[float] = []
 			counts: List[int] = []
-			for model_index, (name, result) in enumerate(zip(self.model_names, results)):
+			for model_index, (name, result) in enumerate(
+				zip(self.model_names, results)
+			):
 				count = 0
 				success = 0
 				for idx, val in result:
@@ -110,19 +135,31 @@ class BayesRun():
 				successes.append(max(success, 0.5))
 				counts.append(count)
 
-			success_weight = sum([(succ / count) * prob for succ, count, prob in zip(successes, counts, self.probabilities)])
-			new_probabilities = [(succ / count) * old_prob / success_weight for succ, count, old_prob in zip(successes, counts, self.probabilities)]
+			success_weight = sum(
+				[
+					(succ / count) * prob
+					for succ, count, prob in zip(successes, counts, self.probabilities)
+				]
+			)
+			new_probabilities = [
+				(succ / count) * old_prob / success_weight
+				for succ, count, old_prob in zip(successes, counts, self.probabilities)
+			]
 			self.probabilities = new_probabilities
 			for name, probability in zip(self.model_names, self.probabilities):
 				row[f"{name}_prob"] = probability
 			_logger.info(row)
 
 			with open(self.filename, "a", newline="") as outfile:
-				writer = csv.DictWriter(outfile, fieldnames=self.csv_fields, dialect="unix")
+				writer = csv.DictWriter(
+					outfile, fieldnames=self.csv_fields, dialect="unix"
+				)
 				writer.writerow(row)
 
 			if self.use_end_threshold:
 				max_prob = max(self.probabilities)
 				if max_prob > self.end_threshold:
-					_logger.info(f"Aborting early, because {max_prob} is greater than {self.end_threshold}")
+					_logger.info(
+						f"Aborting early, because {max_prob} is greater than {self.end_threshold}"
+					)
 					break

@@ -10,7 +10,13 @@ def get_version():
 	return __version__
 
 
-__all__ = ["get_version", "BayesRun", "AltBayesRun", "AltBayesRunSimulPairs", "Diagnostic"]
+__all__ = [
+	"get_version",
+	"BayesRun",
+	"AltBayesRun",
+	"AltBayesRunSimulPairs",
+	"Diagnostic",
+]
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
