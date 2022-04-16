@@ -65,15 +65,19 @@ class AltBayesRun:
 	Parameters
 	----------
 	dot_inputs : Sequence[DotInput]
-			The dot inputs for this bayes run.
+	The dot inputs for this bayes run.
+
 	discretisations_with_names : Sequence[Tuple(str, pdme.model.Model)]
-			The models to evaluate.
+	The models to evaluate.
+
 	actual_model_discretisation : pdme.model.Discretisation
-			The discretisation for the model which is actually correct.
+	The discretisation for the model which is actually correct.
+
 	filename_slug : str
-			The filename slug to include.
+	The filename slug to include.
+
 	run_count: int
-			The number of runs to do.
+	The number of runs to do.
 	"""
 
 	def __init__(
