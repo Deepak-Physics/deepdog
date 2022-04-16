@@ -137,7 +137,7 @@ class AltBayesRunSimulPairs:
 
 		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 		self.filename_pairs = f"{timestamp}-{filename_slug}.simulpairs.pairs.csv"
-		self.filename_no_pairs = f"{timestamp}-{filename_slug}.simulpairs.pairs.csv"
+		self.filename_no_pairs = f"{timestamp}-{filename_slug}.simulpairs.nopairs.csv"
 
 		self.max_frequency = max_frequency
 
