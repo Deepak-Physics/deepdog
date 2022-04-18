@@ -10,6 +10,7 @@ import csv
 import multiprocessing
 import logging
 import numpy
+import numpy.random
 
 
 # TODO: remove hardcode
@@ -33,9 +34,12 @@ def get_a_simul_result_using_pairs(input) -> numpy.ndarray:
 		nonlocal_highs,
 		monte_carlo_count,
 		max_frequency,
+		seed,
 	) = input
+
+	rng = numpy.random.default_rng(seed)
 	sample_dipoles = discretisation.get_model().get_n_single_dipoles(
-		monte_carlo_count, max_frequency
+		monte_carlo_count, max_frequency, rng=rng
 	)
 	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
 	local_matches = pdme.util.fast_v_calc.between(local_vals, local_lows, local_highs)
@@ -190,12 +194,17 @@ class AltBayesRunSimulPairs:
 
 			_logger.info(f"Going to work on dipole at {actual_dipoles.dipoles}")
 
+			# define a new seed sequence for each run
+			seed_sequence = numpy.random.SeedSequence(run)
+
 			results_pairs = []
 			results_no_pairs = []
 			_logger.debug("Going to iterate over discretisations now")
 			for disc_count, discretisation in enumerate(self.discretisations):
 				_logger.debug(f"Doing discretisation #{disc_count}")
-				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
+
+				core_count = multiprocessing.cpu_count() - 1 or 1
+				with multiprocessing.Pool(core_count) as pool:
 					cycle_count = 0
 					cycle_success_pairs = 0
 					cycle_success_no_pairs = 0
@@ -210,6 +219,11 @@ class AltBayesRunSimulPairs:
 						current_success_no_pairs = 0
 						cycle_count += self.monte_carlo_count * self.monte_carlo_cycles
 
+						# generate a seed from the sequence for each core.
+						# note this needs to be inside the loop for monte carlo cycle steps!
+						# that way we get more stuff.
+
+						seeds = seed_sequence.spawn(core_count)
 						current_success_both = numpy.array(
 							sum(
 								pool.imap_unordered(
@@ -225,9 +239,10 @@ class AltBayesRunSimulPairs:
 											pair_highs,
 											self.monte_carlo_count,
 											self.max_frequency,
+											seed,
 										)
-									]
-									* self.monte_carlo_cycles,
+										for seed in seeds
+									],
 									self.chunksize,
 								)
 							)
