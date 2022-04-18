@@ -39,7 +39,7 @@ def get_a_simul_result_using_pairs(input) -> numpy.ndarray:
 
 	rng = numpy.random.default_rng(seed)
 	sample_dipoles = discretisation.get_model().get_n_single_dipoles(
-		monte_carlo_count, max_frequency, rng=rng
+		monte_carlo_count, max_frequency, rng_to_use=rng
 	)
 	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
 	local_matches = pdme.util.fast_v_calc.between(local_vals, local_lows, local_highs)
