@@ -33,26 +33,35 @@ def get_a_simul_result_using_pairs(input) -> numpy.ndarray:
 		nonlocal_lows,
 		nonlocal_highs,
 		monte_carlo_count,
+		monte_carlo_cycles,
 		max_frequency,
 		seed,
 	) = input
 
 	rng = numpy.random.default_rng(seed)
-	sample_dipoles = discretisation.get_model().get_n_single_dipoles(
-		monte_carlo_count, max_frequency, rng_to_use=rng
-	)
-	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
-	local_matches = pdme.util.fast_v_calc.between(local_vals, local_lows, local_highs)
-	nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal(
-		pair_inputs, sample_dipoles
-	)
-	nonlocal_matches = pdme.util.fast_v_calc.between(
-		nonlocal_vals, nonlocal_lows, nonlocal_highs
-	)
-	combined_matches = numpy.logical_and(local_matches, nonlocal_matches)
-	return numpy.array(
-		[numpy.count_nonzero(local_matches), numpy.count_nonzero(combined_matches)]
-	)
+	local_total = 0
+	combined_total = 0
+	for i in range(monte_carlo_cycles):
+		sample_dipoles = discretisation.get_model().get_n_single_dipoles(
+			monte_carlo_count, max_frequency, rng_to_use=rng
+		)
+		local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(
+			dot_inputs, sample_dipoles
+		)
+		local_matches = pdme.util.fast_v_calc.between(
+			local_vals, local_lows, local_highs
+		)
+		nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal(
+			pair_inputs, sample_dipoles
+		)
+		nonlocal_matches = pdme.util.fast_v_calc.between(
+			nonlocal_vals, nonlocal_lows, nonlocal_highs
+		)
+		combined_matches = numpy.logical_and(local_matches, nonlocal_matches)
+
+		local_total += numpy.count_nonzero(local_matches)
+		combined_total += numpy.count_nonzero(combined_matches)
+	return numpy.array([local_total, combined_total])
 
 
 class AltBayesRunSimulPairs:
@@ -238,6 +247,7 @@ class AltBayesRunSimulPairs:
 											pair_lows,
 											pair_highs,
 											self.monte_carlo_count,
+											self.monte_carlo_cycles,
 											self.max_frequency,
 											seed,
 										)
