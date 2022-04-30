@@ -7,7 +7,7 @@ import pdme.util.fast_nonlocal_spectrum
 from typing import Sequence, Tuple, List
 import datetime
 import csv
-import multiprocessing
+import multiprocessingg
 import logging
 import numpy
 import numpy.random
