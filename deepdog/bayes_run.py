@@ -23,8 +23,8 @@ _logger = logging.getLogger(__name__)
 
 
 def get_a_result(input) -> int:
-	discretisation, dot_inputs, lows, highs, monte_carlo_count, max_frequency = input
-	sample_dipoles = discretisation.get_model().get_n_single_dipoles(
+	model, dot_inputs, lows, highs, monte_carlo_count, max_frequency = input
+	sample_dipoles = model.get_model().get_n_single_dipoles(
 		monte_carlo_count, max_frequency
 	)
 	vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
@@ -33,7 +33,7 @@ def get_a_result(input) -> int:
 
 def get_a_result_using_pairs(input) -> int:
 	(
-		discretisation,
+		model,
 		dot_inputs,
 		pair_inputs,
 		local_lows,
@@ -43,9 +43,7 @@ def get_a_result_using_pairs(input) -> int:
 		monte_carlo_count,
 		max_frequency,
 	) = input
-	sample_dipoles = discretisation.get_model().get_n_single_dipoles(
-		monte_carlo_count, max_frequency
-	)
+	sample_dipoles = model.get_n_single_dipoles(monte_carlo_count, max_frequency)
 	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
 	local_matches = pdme.util.fast_v_calc.between(local_vals, local_lows, local_highs)
 	nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal(
@@ -58,7 +56,7 @@ def get_a_result_using_pairs(input) -> int:
 	return numpy.count_nonzero(combined_matches)
 
 
-class AltBayesRun:
+class BayesRun:
 	"""
 	A single Bayes run for a given set of dots.
 
@@ -67,11 +65,11 @@ class AltBayesRun:
 	dot_inputs : Sequence[DotInput]
 	The dot inputs for this bayes run.
 
-	discretisations_with_names : Sequence[Tuple(str, pdme.model.Model)]
+	models_with_names : Sequence[Tuple(str, pdme.model.DipoleModel)]
 	The models to evaluate.
 
-	actual_model_discretisation : pdme.model.Discretisation
-	The discretisation for the model which is actually correct.
+	actual_model : pdme.model.DipoleModel
+	The model which is actually correct.
 
 	filename_slug : str
 	The filename slug to include.
@@ -84,8 +82,8 @@ class AltBayesRun:
 		self,
 		dot_positions: Sequence[numpy.typing.ArrayLike],
 		frequency_range: Sequence[float],
-		discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]],
-		actual_model: pdme.model.Model,
+		models_with_names: Sequence[Tuple[str, pdme.model.DipoleModel]],
+		actual_model: pdme.model.DipoleModel,
 		filename_slug: str,
 		run_count: int = 100,
 		low_error: float = 0.9,
@@ -117,10 +115,10 @@ class AltBayesRun:
 			pdme.measurement.input_types.dot_pair_inputs_to_array(self.dot_pair_inputs)
 		)
 
-		self.discretisations = [disc for (_, disc) in discretisations_with_names]
-		self.model_names = [name for (name, _) in discretisations_with_names]
+		self.models = [model for (_, model) in models_with_names]
+		self.model_names = [name for (name, _) in models_with_names]
 		self.actual_model = actual_model
-		self.model_count = len(self.discretisations)
+		self.model_count = len(self.models)
 		self.monte_carlo_count = monte_carlo_count
 		self.monte_carlo_cycles = monte_carlo_cycles
 		self.target_success = target_success
@@ -203,9 +201,9 @@ class AltBayesRun:
 			_logger.info(f"Going to work on dipole at {actual_dipoles.dipoles}")
 
 			results = []
-			_logger.debug("Going to iterate over discretisations now")
-			for disc_count, discretisation in enumerate(self.discretisations):
-				_logger.debug(f"Doing discretisation #{disc_count}")
+			_logger.debug("Going to iterate over models now")
+			for model_count, model in enumerate(self.models):
+				_logger.debug(f"Doing model #{model_count}")
 				with multiprocessing.Pool(multiprocessing.cpu_count() - 1 or 1) as pool:
 					cycle_count = 0
 					cycle_success = 0
@@ -223,7 +221,7 @@ class AltBayesRun:
 									get_a_result_using_pairs,
 									[
 										(
-											discretisation,
+											model,
 											self.dot_inputs_array,
 											self.dot_pair_inputs_array,
 											lows,
@@ -244,7 +242,7 @@ class AltBayesRun:
 									get_a_result,
 									[
 										(
-											discretisation,
+											model,
 											self.dot_inputs_array,
 											lows,
 											highs,
