@@ -171,10 +171,9 @@ class BayesRunSimulPairs:
 		for run in range(1, self.run_count + 1):
 
 			rng = numpy.random.default_rng()
-			frequency = rng.uniform(1, self.max_frequency)
 
 			# Generate the actual dipoles
-			actual_dipoles = self.actual_model.get_dipoles(frequency)
+			actual_dipoles = self.actual_model.get_dipoles(self.max_frequency)
 
 			dots = actual_dipoles.get_percent_range_dot_measurements(
 				self.dot_inputs, self.low_error, self.high_error
