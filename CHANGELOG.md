@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.4.0...0.5.0) (2022-04-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* simulpairs now uses different rng calculator
+
+### Features
+
+* adds simulpairs run ([e9277c3](https://gitea.deepak.science:2222/physics/deepdog/commit/e9277c3da777359feb352c0b19f3bb029248ba2f))
+* has better parallelisation ([edf0ba6](https://gitea.deepak.science:2222/physics/deepdog/commit/edf0ba6532c0588fce32341709cdb70e384b83f4))
+* simulpairs now uses different rng calculator ([50dbc48](https://gitea.deepak.science:2222/physics/deepdog/commit/50dbc4835e60bace9e9b4ba37415f073a3c9e479))
+
+
+### Bug Fixes
+
+* better parallelisation hopefully ([42829c0](https://gitea.deepak.science:2222/physics/deepdog/commit/42829c0327e080e18be2fb75e746f6ac0d7c2f6d))
+* Makes altbayessimulpairs available in package ([492a5e6](https://gitea.deepak.science:2222/physics/deepdog/commit/492a5e6681c85f95840e28cfd5d4ce4ca1d54eba))
+* stronger names ([0954429](https://gitea.deepak.science:2222/physics/deepdog/commit/0954429e2d015a105ff16dfbb9e7a352bf53e5e9))
+* Uses correct filename arg for passed in rng ([349341b](https://gitea.deepak.science:2222/physics/deepdog/commit/349341b405375a43b933f1fd7db4ee9fc501def3))
+* uses correct filename for pairs guy ([4c06b39](https://gitea.deepak.science:2222/physics/deepdog/commit/4c06b3912c811c93c310b1d9e4c153f2014c4f8b))
+
 ## [0.4.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.3.5...0.4.0) (2022-04-10)
 
 
