@@ -41,26 +41,26 @@ def get_a_simul_result_using_pairs(input) -> numpy.ndarray:
 	rng = numpy.random.default_rng(seed)
 	local_total = 0
 	combined_total = 0
-	for i in range(monte_carlo_cycles):
-		sample_dipoles = discretisation.get_model().get_n_single_dipoles(
-			monte_carlo_count, max_frequency, rng_to_use=rng
-		)
-		local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(
-			dot_inputs, sample_dipoles
-		)
-		local_matches = pdme.util.fast_v_calc.between(
-			local_vals, local_lows, local_highs
-		)
-		nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal(
-			pair_inputs, sample_dipoles
-		)
-		nonlocal_matches = pdme.util.fast_v_calc.between(
-			nonlocal_vals, nonlocal_lows, nonlocal_highs
-		)
-		combined_matches = numpy.logical_and(local_matches, nonlocal_matches)
 
-		local_total += numpy.count_nonzero(local_matches)
-		combined_total += numpy.count_nonzero(combined_matches)
+	sample_dipoles = discretisation.get_model().get_n_single_dipoles(
+		monte_carlo_count, max_frequency, rng_to_use=rng
+	)
+	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(
+		dot_inputs, sample_dipoles
+	)
+	local_matches = pdme.util.fast_v_calc.between(
+		local_vals, local_lows, local_highs
+	)
+	nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal(
+		pair_inputs, sample_dipoles
+	)
+	nonlocal_matches = pdme.util.fast_v_calc.between(
+		nonlocal_vals, nonlocal_lows, nonlocal_highs
+	)
+	combined_matches = numpy.logical_and(local_matches, nonlocal_matches)
+
+	local_total += numpy.count_nonzero(local_matches)
+	combined_total += numpy.count_nonzero(combined_matches)
 	return numpy.array([local_total, combined_total])
 
 
@@ -223,6 +223,7 @@ class AltBayesRunSimulPairs:
 						<= self.target_success
 					):
 						_logger.debug(f"Starting cycle {cycles}")
+						_logger.debug(f"(pair, no_pair) successes are {(cycle_success_pairs, cycle_success_no_pairs)}")
 						cycles += 1
 						current_success_pairs = 0
 						current_success_no_pairs = 0
@@ -232,7 +233,8 @@ class AltBayesRunSimulPairs:
 						# note this needs to be inside the loop for monte carlo cycle steps!
 						# that way we get more stuff.
 
-						seeds = seed_sequence.spawn(core_count)
+						seeds = seed_sequence.spawn(self.monte_carlo_cycles)
+						_logger.debug(f"Creating {self.monte_carlo_cycles} seeds")
 						current_success_both = numpy.array(
 							sum(
 								pool.imap_unordered(
@@ -330,8 +332,8 @@ class AltBayesRunSimulPairs:
 			):
 				row_pairs[f"{name}_prob"] = probability_pair
 				row_no_pairs[f"{name}_prob"] = probability_no_pair
-			_logger.info(row_pairs)
-			_logger.info(row_no_pairs)
+			_logger.debug(row_pairs)
+			_logger.debug(row_no_pairs)
 
 			with open(self.filename_pairs, "a", newline="") as outfile:
 				writer = csv.DictWriter(
