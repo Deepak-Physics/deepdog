@@ -119,6 +119,13 @@ class BayesRunSimulPairs:
 		self.models = [mod for (_, mod) in models_with_names]
 		self.model_names = [name for (name, _) in models_with_names]
 		self.actual_model = actual_model
+
+		self.n: int
+		try:
+			self.n = self.actual_model.n  # type: ignore
+		except AttributeError:
+			self.n = 1
+
 		self.model_count = len(self.models)
 		self.monte_carlo_count = monte_carlo_count
 		self.monte_carlo_cycles = monte_carlo_cycles
@@ -135,7 +142,16 @@ class BayesRunSimulPairs:
 			self.pairs_high_error = self.high_error
 		else:
 			self.pairs_high_error = pairs_high_error
-		self.csv_fields = ["dipole_moment", "dipole_location", "dipole_frequency"]
+
+		self.csv_fields = []
+		for i in range(self.n):
+			self.csv_fields.extend(
+				[
+					f"dipole_moment_{i+1}",
+					"dipole_location_{i+1}",
+					"dipole_frequency_{i+1}",
+				]
+			)
 		self.compensate_zeros = True
 		self.chunksize = chunksize
 		for name in self.model_names:
@@ -265,15 +281,25 @@ class BayesRunSimulPairs:
 
 			_logger.debug("Done, constructing output now")
 			row_pairs = {
-				"dipole_moment": actual_dipoles.dipoles[0].p,
-				"dipole_location": actual_dipoles.dipoles[0].s,
-				"dipole_frequency": actual_dipoles.dipoles[0].w,
+				"dipole_moment_1": actual_dipoles.dipoles[0].p,
+				"dipole_location_1": actual_dipoles.dipoles[0].s,
+				"dipole_frequency_1": actual_dipoles.dipoles[0].w,
 			}
 			row_no_pairs = {
-				"dipole_moment": actual_dipoles.dipoles[0].p,
-				"dipole_location": actual_dipoles.dipoles[0].s,
-				"dipole_frequency": actual_dipoles.dipoles[0].w,
+				"dipole_moment_1": actual_dipoles.dipoles[0].p,
+				"dipole_location_1": actual_dipoles.dipoles[0].s,
+				"dipole_frequency_1": actual_dipoles.dipoles[0].w,
 			}
+			row_pairs = {}
+			row_no_pairs = {}
+			for i in range(1, self.n):
+				row_pairs[f"dipole_moment_{i+1}"] = actual_dipoles.dipoles[i].p
+				row_pairs[f"dipole_location_{i+1}"] = actual_dipoles.dipoles[i].s
+				row_pairs[f"dipole_frequency_{i+1}"] = actual_dipoles.dipoles[i].w
+				row_no_pairs[f"dipole_moment_{i+1}"] = actual_dipoles.dipoles[i].p
+				row_no_pairs[f"dipole_location_{i+1}"] = actual_dipoles.dipoles[i].s
+				row_no_pairs[f"dipole_frequency_{i+1}"] = actual_dipoles.dipoles[i].w
+
 			successes_pairs: List[float] = []
 			successes_no_pairs: List[float] = []
 			counts: List[int] = []
