@@ -216,9 +216,7 @@ class BayesRunSimulPairs:
 						<= self.target_success
 					):
 						_logger.debug(f"Starting cycle {cycles}")
-						_logger.debug(
-							f"(pair, no_pair) successes are {(cycle_success_pairs, cycle_success_no_pairs)}"
-						)
+
 						cycles += 1
 						current_success_pairs = 0
 						current_success_no_pairs = 0
@@ -259,6 +257,9 @@ class BayesRunSimulPairs:
 
 						cycle_success_no_pairs += current_success_no_pairs
 						cycle_success_pairs += current_success_pairs
+						_logger.debug(
+							f"(pair, no_pair) successes are {(cycle_success_pairs, cycle_success_no_pairs)}"
+						)
 					results_pairs.append((cycle_count, cycle_success_pairs))
 					results_no_pairs.append((cycle_count, cycle_success_no_pairs))
 
