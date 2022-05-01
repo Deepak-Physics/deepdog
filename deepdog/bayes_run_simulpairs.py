@@ -290,8 +290,6 @@ class BayesRunSimulPairs:
 				"dipole_location_1": actual_dipoles.dipoles[0].s,
 				"dipole_frequency_1": actual_dipoles.dipoles[0].w,
 			}
-			row_pairs = {}
-			row_no_pairs = {}
 			for i in range(1, self.n):
 				row_pairs[f"dipole_moment_{i+1}"] = actual_dipoles.dipoles[i].p
 				row_pairs[f"dipole_location_{i+1}"] = actual_dipoles.dipoles[i].s
