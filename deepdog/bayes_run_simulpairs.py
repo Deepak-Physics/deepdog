@@ -148,8 +148,8 @@ class BayesRunSimulPairs:
 			self.csv_fields.extend(
 				[
 					f"dipole_moment_{i+1}",
-					"dipole_location_{i+1}",
-					"dipole_frequency_{i+1}",
+					f"dipole_location_{i+1}",
+					f"dipole_frequency_{i+1}",
 				]
 			)
 		self.compensate_zeros = True
