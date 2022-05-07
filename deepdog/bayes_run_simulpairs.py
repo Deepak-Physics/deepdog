@@ -291,12 +291,17 @@ class BayesRunSimulPairs:
 				"dipole_frequency_1": actual_dipoles.dipoles[0].w,
 			}
 			for i in range(1, self.n):
-				row_pairs[f"dipole_moment_{i+1}"] = actual_dipoles.dipoles[i].p
-				row_pairs[f"dipole_location_{i+1}"] = actual_dipoles.dipoles[i].s
-				row_pairs[f"dipole_frequency_{i+1}"] = actual_dipoles.dipoles[i].w
-				row_no_pairs[f"dipole_moment_{i+1}"] = actual_dipoles.dipoles[i].p
-				row_no_pairs[f"dipole_location_{i+1}"] = actual_dipoles.dipoles[i].s
-				row_no_pairs[f"dipole_frequency_{i+1}"] = actual_dipoles.dipoles[i].w
+				try:
+					current_dipoles = actual_dipoles.dipoles[i]
+					row_pairs[f"dipole_moment_{i+1}"] = current_dipoles.p
+					row_pairs[f"dipole_location_{i+1}"] = current_dipoles.s
+					row_pairs[f"dipole_frequency_{i+1}"] = current_dipoles.w
+					row_no_pairs[f"dipole_moment_{i+1}"] = current_dipoles.p
+					row_no_pairs[f"dipole_location_{i+1}"] = current_dipoles.s
+					row_no_pairs[f"dipole_frequency_{i+1}"] = current_dipoles.w
+				except IndexError as e:
+					_logger.info(f"Not writing anymore, saw end after {i}")
+					break
 
 			successes_pairs: List[float] = []
 			successes_no_pairs: List[float] = []
