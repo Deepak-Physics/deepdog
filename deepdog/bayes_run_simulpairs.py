@@ -299,7 +299,7 @@ class BayesRunSimulPairs:
 					row_no_pairs[f"dipole_moment_{i+1}"] = current_dipoles.p
 					row_no_pairs[f"dipole_location_{i+1}"] = current_dipoles.s
 					row_no_pairs[f"dipole_frequency_{i+1}"] = current_dipoles.w
-				except IndexError as e:
+				except IndexError:
 					_logger.info(f"Not writing anymore, saw end after {i}")
 					break
 
