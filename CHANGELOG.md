@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.1](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.0...0.6.1) (2022-05-22)
+
+
+### Features
+
+* adds new runner for real spectra ([bd56f24](https://gitea.deepak.science:2222/physics/deepdog/commit/bd56f247748babb2ee1f2a1182d25aa968bff5a5))
+
 ## [0.6.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.5.0...0.6.0) (2022-05-22)
 
 
