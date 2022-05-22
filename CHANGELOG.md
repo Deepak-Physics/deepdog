@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.5.0...0.6.0) (2022-05-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* bayes run now handles multidipoles with changes to output file format etc.
+* logs multiple dipoles better maybe
+* switches over to pdme new stuff, uses models and scraps discretisations entirely
+* removes alt_bayes bayes distinction, which was superfluous when only alt worked
+
+### Features
+
+* adds pdme 0.7.0 for multiprocessing ([874d876](https://gitea.deepak.science:2222/physics/deepdog/commit/874d876c9d774433b034d47c4cc0cdac41e6f2c7))
+* bayes run now handles multidipoles with changes to output file format etc. ([5d0a7a4](https://gitea.deepak.science:2222/physics/deepdog/commit/5d0a7a4be09c58f8f8f859384f01d7912a98b8b9))
+* logs multiple dipoles better maybe ([ae8977b](https://gitea.deepak.science:2222/physics/deepdog/commit/ae8977bb1e4d6cd71e88ea0876da8f4318e030b6))
+* removes alt_bayes bayes distinction, which was superfluous when only alt worked ([101569d](https://gitea.deepak.science:2222/physics/deepdog/commit/101569d749e4f3f1842886aa2fd3321b8132278b))
+* switches over to pdme new stuff, uses models and scraps discretisations entirely ([6e29f7a](https://gitea.deepak.science:2222/physics/deepdog/commit/6e29f7a702b578c266a42bba23ac973d155ada10))
+* Uses multidipole for bayes run, with more verbose output ([df89776](https://gitea.deepak.science:2222/physics/deepdog/commit/df8977655de977fd3c4f7383dd9571e551eb1382))
+
+
+### Bug Fixes
+
+* another bug fix for csv generation ([b7da3d6](https://gitea.deepak.science:2222/physics/deepdog/commit/b7da3d61cc5c128cba1d2fcb3770b71b7f6fc4b8))
+* fixes crash when dipole count is smaller than expected max during file write ([b5e0ecb](https://gitea.deepak.science:2222/physics/deepdog/commit/b5e0ecb52886b32d9055302eacfabb69338026b4))
+* fixes format string in csv output for headers ([9afa209](https://gitea.deepak.science:2222/physics/deepdog/commit/9afa209864cdb9255988778e987fe05952848fd4))
+* fixes random issue ([eec926a](https://gitea.deepak.science:2222/physics/deepdog/commit/eec926aaac654f78942b4c6b612e4d1cdcbf81dc))
+* moves logging successes to after they've actually happened ([0caad05](https://gitea.deepak.science:2222/physics/deepdog/commit/0caad05e3cc6a9adba8bf937c3d2f944e1b096a3))
+* now doesn't double randomise frequency ([23b202b](https://gitea.deepak.science:2222/physics/deepdog/commit/23b202beb81cb89f7f20b691e83116fa53764902))
+* whoops deleted word multiprocessing ([31070b5](https://gitea.deepak.science:2222/physics/deepdog/commit/31070b5342c265d930b4c51402f42a3ee2415066))
+
 ## [0.5.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.4.0...0.5.0) (2022-04-30)
 
 
