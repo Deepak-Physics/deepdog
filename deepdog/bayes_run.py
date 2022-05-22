@@ -29,7 +29,7 @@ def get_a_result(input) -> int:
 	sample_dipoles = model.get_monte_carlo_dipole_inputs(
 		monte_carlo_count, max_frequency, rng_to_use=rng
 	)
-	vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(dot_inputs, sample_dipoles)
+	vals = pdme.util.fast_v_calc.fast_vs_for_dipoleses(dot_inputs, sample_dipoles)
 	return numpy.count_nonzero(pdme.util.fast_v_calc.between(vals, lows, highs))
 
 
@@ -221,6 +221,9 @@ class BayesRun:
 						)
 
 						cycle_success += current_success
+						_logger.debug(
+							f"current running successes: {cycle_success}"
+						)
 					results.append((cycle_count, cycle_success))
 
 			_logger.debug("Done, constructing output now")
