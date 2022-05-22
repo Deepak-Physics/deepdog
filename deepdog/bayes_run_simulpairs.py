@@ -25,7 +25,7 @@ _logger = logging.getLogger(__name__)
 
 def get_a_simul_result_using_pairs(input) -> numpy.ndarray:
 	(
-		discretisation,
+		model,
 		dot_inputs,
 		pair_inputs,
 		local_lows,
@@ -42,16 +42,12 @@ def get_a_simul_result_using_pairs(input) -> numpy.ndarray:
 	local_total = 0
 	combined_total = 0
 
-	sample_dipoles = discretisation.get_model().get_n_single_dipoles(
+	sample_dipoles = model.get_monte_carlo_dipole_inputs(
 		monte_carlo_count, max_frequency, rng_to_use=rng
 	)
-	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoles(
-		dot_inputs, sample_dipoles
-	)
-	local_matches = pdme.util.fast_v_calc.between(
-		local_vals, local_lows, local_highs
-	)
-	nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal(
+	local_vals = pdme.util.fast_v_calc.fast_vs_for_dipoleses(dot_inputs, sample_dipoles)
+	local_matches = pdme.util.fast_v_calc.between(local_vals, local_lows, local_highs)
+	nonlocal_vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal_dipoleses(
 		pair_inputs, sample_dipoles
 	)
 	nonlocal_matches = pdme.util.fast_v_calc.between(
@@ -64,7 +60,7 @@ def get_a_simul_result_using_pairs(input) -> numpy.ndarray:
 	return numpy.array([local_total, combined_total])
 
 
-class AltBayesRunSimulPairs:
+class BayesRunSimulPairs:
 	"""
 	A dual pairs-nonpairs Bayes run for a given set of dots.
 
@@ -73,11 +69,11 @@ class AltBayesRunSimulPairs:
 	dot_inputs : Sequence[DotInput]
 	The dot inputs for this bayes run.
 
-	discretisations_with_names : Sequence[Tuple(str, pdme.model.Model)]
+	models_with_names : Sequence[Tuple(str, pdme.model.DipoleModel)]
 	The models to evaluate.
 
-	actual_model_discretisation : pdme.model.Discretisation
-	The discretisation for the model which is actually correct.
+	actual_model : pdme.model.DipoleModel
+	The modoel for the model which is actually correct.
 
 	filename_slug : str
 	The filename slug to include.
@@ -90,8 +86,8 @@ class AltBayesRunSimulPairs:
 		self,
 		dot_positions: Sequence[numpy.typing.ArrayLike],
 		frequency_range: Sequence[float],
-		discretisations_with_names: Sequence[Tuple[str, pdme.model.Discretisation]],
-		actual_model: pdme.model.Model,
+		models_with_names: Sequence[Tuple[str, pdme.model.DipoleModel]],
+		actual_model: pdme.model.DipoleModel,
 		filename_slug: str,
 		run_count: int = 100,
 		low_error: float = 0.9,
@@ -120,10 +116,17 @@ class AltBayesRunSimulPairs:
 			pdme.measurement.input_types.dot_pair_inputs_to_array(self.dot_pair_inputs)
 		)
 
-		self.discretisations = [disc for (_, disc) in discretisations_with_names]
-		self.model_names = [name for (name, _) in discretisations_with_names]
+		self.models = [mod for (_, mod) in models_with_names]
+		self.model_names = [name for (name, _) in models_with_names]
 		self.actual_model = actual_model
-		self.model_count = len(self.discretisations)
+
+		self.n: int
+		try:
+			self.n = self.actual_model.n  # type: ignore
+		except AttributeError:
+			self.n = 1
+
+		self.model_count = len(self.models)
 		self.monte_carlo_count = monte_carlo_count
 		self.monte_carlo_cycles = monte_carlo_cycles
 		self.target_success = target_success
@@ -139,7 +142,16 @@ class AltBayesRunSimulPairs:
 			self.pairs_high_error = self.high_error
 		else:
 			self.pairs_high_error = pairs_high_error
-		self.csv_fields = ["dipole_moment", "dipole_location", "dipole_frequency"]
+
+		self.csv_fields = []
+		for i in range(self.n):
+			self.csv_fields.extend(
+				[
+					f"dipole_moment_{i+1}",
+					f"dipole_location_{i+1}",
+					f"dipole_frequency_{i+1}",
+				]
+			)
 		self.compensate_zeros = True
 		self.chunksize = chunksize
 		for name in self.model_names:
@@ -174,11 +186,8 @@ class AltBayesRunSimulPairs:
 
 		for run in range(1, self.run_count + 1):
 
-			rng = numpy.random.default_rng()
-			frequency = rng.uniform(1, self.max_frequency)
-
 			# Generate the actual dipoles
-			actual_dipoles = self.actual_model.get_dipoles(frequency)
+			actual_dipoles = self.actual_model.get_dipoles(self.max_frequency)
 
 			dots = actual_dipoles.get_percent_range_dot_measurements(
 				self.dot_inputs, self.low_error, self.high_error
@@ -208,9 +217,9 @@ class AltBayesRunSimulPairs:
 
 			results_pairs = []
 			results_no_pairs = []
-			_logger.debug("Going to iterate over discretisations now")
-			for disc_count, discretisation in enumerate(self.discretisations):
-				_logger.debug(f"Doing discretisation #{disc_count}")
+			_logger.debug("Going to iterate over models now")
+			for model_count, model in enumerate(self.models):
+				_logger.debug(f"Doing model #{model_count}")
 
 				core_count = multiprocessing.cpu_count() - 1 or 1
 				with multiprocessing.Pool(core_count) as pool:
@@ -223,7 +232,7 @@ class AltBayesRunSimulPairs:
 						<= self.target_success
 					):
 						_logger.debug(f"Starting cycle {cycles}")
-						_logger.debug(f"(pair, no_pair) successes are {(cycle_success_pairs, cycle_success_no_pairs)}")
+
 						cycles += 1
 						current_success_pairs = 0
 						current_success_no_pairs = 0
@@ -241,7 +250,7 @@ class AltBayesRunSimulPairs:
 									get_a_simul_result_using_pairs,
 									[
 										(
-											discretisation,
+											model,
 											self.dot_inputs_array,
 											self.dot_pair_inputs_array,
 											lows,
@@ -264,20 +273,36 @@ class AltBayesRunSimulPairs:
 
 						cycle_success_no_pairs += current_success_no_pairs
 						cycle_success_pairs += current_success_pairs
+						_logger.debug(
+							f"(pair, no_pair) successes are {(cycle_success_pairs, cycle_success_no_pairs)}"
+						)
 					results_pairs.append((cycle_count, cycle_success_pairs))
 					results_no_pairs.append((cycle_count, cycle_success_no_pairs))
 
 			_logger.debug("Done, constructing output now")
 			row_pairs = {
-				"dipole_moment": actual_dipoles.dipoles[0].p,
-				"dipole_location": actual_dipoles.dipoles[0].s,
-				"dipole_frequency": actual_dipoles.dipoles[0].w,
+				"dipole_moment_1": actual_dipoles.dipoles[0].p,
+				"dipole_location_1": actual_dipoles.dipoles[0].s,
+				"dipole_frequency_1": actual_dipoles.dipoles[0].w,
 			}
 			row_no_pairs = {
-				"dipole_moment": actual_dipoles.dipoles[0].p,
-				"dipole_location": actual_dipoles.dipoles[0].s,
-				"dipole_frequency": actual_dipoles.dipoles[0].w,
+				"dipole_moment_1": actual_dipoles.dipoles[0].p,
+				"dipole_location_1": actual_dipoles.dipoles[0].s,
+				"dipole_frequency_1": actual_dipoles.dipoles[0].w,
 			}
+			for i in range(1, self.n):
+				try:
+					current_dipoles = actual_dipoles.dipoles[i]
+					row_pairs[f"dipole_moment_{i+1}"] = current_dipoles.p
+					row_pairs[f"dipole_location_{i+1}"] = current_dipoles.s
+					row_pairs[f"dipole_frequency_{i+1}"] = current_dipoles.w
+					row_no_pairs[f"dipole_moment_{i+1}"] = current_dipoles.p
+					row_no_pairs[f"dipole_location_{i+1}"] = current_dipoles.s
+					row_no_pairs[f"dipole_frequency_{i+1}"] = current_dipoles.w
+				except IndexError:
+					_logger.info(f"Not writing anymore, saw end after {i}")
+					break
+
 			successes_pairs: List[float] = []
 			successes_no_pairs: List[float] = []
 			counts: List[int] = []
