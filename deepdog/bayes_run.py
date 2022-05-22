@@ -221,9 +221,7 @@ class BayesRun:
 						)
 
 						cycle_success += current_success
-						_logger.debug(
-							f"current running successes: {cycle_success}"
-						)
+						_logger.debug(f"current running successes: {cycle_success}")
 					results.append((cycle_count, cycle_success))
 
 			_logger.debug("Done, constructing output now")
