@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.2](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.1...0.6.2) (2022-05-26)
+
+
+### Features
+
+* adds better import api for real data run ([d7e0f13](https://gitea.deepak.science:2222/physics/deepdog/commit/d7e0f13ca55197b24cb534c80f321ee76b9c4a40))
+
 ### [0.6.1](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.0...0.6.1) (2022-05-22)
 
 
