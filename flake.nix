@@ -2,7 +2,7 @@
   description = "Application packaged using poetry2nix";
 
   inputs.flake-utils.url = "github:numtide/flake-utils?rev=0f8662f1319ad6abf89b3380dd2722369fc51ade";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs?rev=e194871435cad8ffb1d64b64fb7df3b2b8a10088";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs?rev=37b6b161e536fddca54424cf80662bce735bdd1e";
   inputs.poetry2nix.url = "github:nix-community/poetry2nix?rev=7b71679fa7df00e1678fc3f1d1d4f5f372341b63";
 
   outputs = { self, nixpkgs, flake-utils, poetry2nix }:
@@ -13,15 +13,23 @@
         (final: prev: {
           # The application
           deepdog = prev.poetry2nix.mkPoetryApplication {
-            overrides = [
-              prev.poetry2nix.defaultPoetryOverrides
-            ];
+            overrides = final.poetry2nix.overrides.withDefaults (self: super: {
+              # …
+              # workaround https://github.com/nix-community/poetry2nix/issues/568
+              pdme = super.pdme.overridePythonAttrs (old: {
+                buildInputs = old.buildInputs or [ ] ++ [ final.python39.pkgs.poetry-core ];
+              });
+            });
             projectDir = ./.;
           };
           deepdogEnv = prev.poetry2nix.mkPoetryEnv {
-            overrides = [
-              prev.poetry2nix.defaultPoetryOverrides
-            ];
+            overrides = final.poetry2nix.overrides.withDefaults (self: super: {
+              # …
+              # workaround https://github.com/nix-community/poetry2nix/issues/568
+              pdme = super.pdme.overridePythonAttrs (old: {
+                buildInputs = old.buildInputs or [ ] ++ [ final.python39.pkgs.poetry-core ];
+              });
+            });
             projectDir = ./.;
           };
         })
