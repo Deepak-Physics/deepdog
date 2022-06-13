@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.3](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.2...0.6.3) (2022-06-12)
+
+
+### Features
+
+* adds fast filter variant ([2c5c122](https://gitea.deepak.science:2222/physics/deepdog/commit/2c5c1228209e51d17253f07470e2f1e6dc6872d7))
+* adds tester for fast filter real spectrum ([0a1a277](https://gitea.deepak.science:2222/physics/deepdog/commit/0a1a27759b0d4ab01da214b76ab14bf2b1fe00e3))
+
 ### [0.6.2](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.1...0.6.2) (2022-05-26)
 
 
