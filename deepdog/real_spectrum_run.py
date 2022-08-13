@@ -140,8 +140,10 @@ class RealSpectrumRun:
 
 		results = []
 		_logger.debug("Going to iterate over models now")
-		for model_count, model in enumerate(self.models):
-			_logger.debug(f"Doing model #{model_count}")
+		for model_count, (model, model_name) in enumerate(
+			zip(self.models, self.model_names)
+		):
+			_logger.debug(f"Doing model #{model_count}: {model_name}")
 			core_count = multiprocessing.cpu_count() - 1 or 1
 			with multiprocessing.Pool(core_count) as pool:
 				cycle_count = 0
