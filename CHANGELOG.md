@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.4](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.3...0.6.4) (2022-08-13)
+
+
+### Features
+
+* Prints model names while running ([7ea1d71](https://gitea.deepak.science:2222/physics/deepdog/commit/7ea1d715f67e81c9fa841c5a62f1cc700ff7363d))
+
 ### [0.6.3](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.2...0.6.3) (2022-06-12)
 
 
