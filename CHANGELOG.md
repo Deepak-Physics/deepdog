@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.5](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.4...0.6.5) (2023-04-09)
+
+
+### Features
+
+* adds temp aware guy using new pdme temp-flexible feature for bundling temp models ([de1ec3e](https://gitea.deepak.science:2222/physics/deepdog/commit/de1ec3e70062d418e0d4c89716905cc9313d2e26))
+
 ### [0.6.4](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.3...0.6.4) (2022-08-13)
 
 
