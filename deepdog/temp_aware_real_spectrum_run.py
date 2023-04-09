@@ -40,8 +40,6 @@ def get_a_result_fast_filter(input) -> int:
 	for temp in dot_inputs_dict.keys():
 		dot_inputs = dot_inputs_dict[temp]
 		lows, highs = low_high_dict[temp]
-		_logger.info(f"current sample length: {len(current_sample)}")
-		_logger.info(f"workng on temp {temp}")
 		for di, low, high in zip(dot_inputs, lows, highs):
 
 			if len(current_sample) < 1:
