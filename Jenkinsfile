@@ -12,11 +12,6 @@ pipeline {
 		parallelsAlwaysFailFast()
 	}
 
-	environment {
-		POETRY_HOME="/opt/poetry"
-		POETRY_VERSION="1.1.12"
-	}
-
 	stages {
 		stage('Build') {
 			steps {
