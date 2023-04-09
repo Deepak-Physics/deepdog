@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.6](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.5...0.6.6) (2023-04-09)
+
+
+### Bug Fixes
+
+* removes bad logging in multiprocessing function ([8fd1b75](https://gitea.deepak.science:2222/physics/deepdog/commit/8fd1b75e1378301210bfa8f14dd09174bbd21414))
+
 ### [0.6.5](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.4...0.6.5) (2023-04-09)
 
 
