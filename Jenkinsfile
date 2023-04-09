@@ -22,26 +22,25 @@ pipeline {
 			steps {
 				echo 'Building...'
 				sh 'python --version'
-				sh 'curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python'
-				sh '${POETRY_HOME}/bin/poetry --version'
-				sh '${POETRY_HOME}/bin/poetry install'
+				sh 'poetry --version'
+				sh 'poetry install'
 			}
 		}
 		stage('Test') {
 			parallel{
 				stage('pytest') {
 					steps {
-						sh '${POETRY_HOME}/bin/poetry run pytest'
+						sh 'poetry run pytest'
 					}
 				}
 				stage('lint') {
 					steps {
-						sh '${POETRY_HOME}/bin/poetry run flake8 deepdog tests'
+						sh 'poetry run flake8 deepdog tests'
 					}
 				}
 				stage('mypy') {
 					steps {
-						sh '${POETRY_HOME}/bin/poetry run mypy deepdog'
+						sh 'poetry run mypy deepdog'
 					}
 				}
 			}
@@ -57,7 +56,7 @@ pipeline {
 			}
 			steps {
 				echo 'Deploying...'
-				sh '${POETRY_HOME}/bin/poetry publish -u ${PYPI_USR} -p ${PYPI_PSW} --build'
+				sh 'poetry publish -u ${PYPI_USR} -p ${PYPI_PSW} --build'
 			}
 		}
 
