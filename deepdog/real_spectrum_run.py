@@ -88,6 +88,7 @@ class RealSpectrumRun:
 		chunksize: int = CHUNKSIZE,
 		initial_seed: int = 12345,
 		use_fast_filter: bool = True,
+		cap_core_count: int = 0,
 	) -> None:
 		self.measurements = measurements
 		self.dot_inputs = [(measure.r, measure.f) for measure in self.measurements]
@@ -123,6 +124,8 @@ class RealSpectrumRun:
 		self.filename = f"{timestamp}-{filename_slug}.realdata.{ff_string}.bayesrun.csv"
 		self.initial_seed = initial_seed
 
+		self.cap_core_count = cap_core_count
+
 	def go(self) -> None:
 		with open(self.filename, "a", newline="") as outfile:
 			writer = csv.DictWriter(outfile, fieldnames=self.csv_fields, dialect="unix")
@@ -140,11 +143,14 @@ class RealSpectrumRun:
 
 		results = []
 		_logger.debug("Going to iterate over models now")
+		core_count = multiprocessing.cpu_count() - 1 or 1
+		if (self.cap_core_count >= 1) and (self.cap_core_count < core_count):
+			core_count = self.cap_core_count
+		_logger.info(f"Using {core_count} cores")
 		for model_count, (model, model_name) in enumerate(
 			zip(self.models, self.model_names)
 		):
 			_logger.debug(f"Doing model #{model_count}: {model_name}")
-			core_count = multiprocessing.cpu_count() - 1 or 1
 			with multiprocessing.Pool(core_count) as pool:
 				cycle_count = 0
 				cycle_success = 0
