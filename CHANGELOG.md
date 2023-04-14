@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.7](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.6...0.6.7) (2023-04-14)
+
+
+### Features
+
+* adds option to cap core count for real spectrum run ([bf15f4a](https://gitea.deepak.science:2222/physics/deepdog/commit/bf15f4a7b7f59504983624e7d512ed7474372032))
+* adds option to cap core count for temp aware run ([12903b2](https://gitea.deepak.science:2222/physics/deepdog/commit/12903b2540cefb040174d230bc0d04719a6dc1b7))
+
+
+### Bug Fixes
+
+* avoids redefinition of core count in loop ([1cf4454](https://gitea.deepak.science:2222/physics/deepdog/commit/1cf44541531541088198bd4599d467df3e1acbcf))
+
 ### [0.6.6](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.5...0.6.6) (2023-04-09)
 
 
