@@ -5,7 +5,7 @@ import pdme.measurement.input_types
 import pdme.measurement.oscillating_dipole
 import pdme.util.fast_v_calc
 import pdme.util.fast_nonlocal_spectrum
-from typing import Sequence, Tuple, List, Dict, Union
+from typing import Sequence, Tuple, List, Dict, Union, Optional
 import datetime
 import csv
 import multiprocessing
@@ -30,6 +30,52 @@ def get_a_result(input) -> int:
 	)
 	vals = pdme.util.fast_v_calc.fast_vs_for_dipoleses(dot_inputs, sample_dipoles)
 	return numpy.count_nonzero(pdme.util.fast_v_calc.between(vals, lows, highs))
+
+
+def get_a_result_fast_filter_pairs(input) -> int:
+	(
+		model,
+		dot_inputs,
+		lows,
+		highs,
+		pair_inputs,
+		pair_lows,
+		pair_highs,
+		monte_carlo_count,
+		seed,
+	) = input
+
+	rng = numpy.random.default_rng(seed)
+	# TODO: A long term refactor is to pull the frequency stuff out from here. The None stands for max_frequency, which is unneeded in the actually useful models.
+	sample_dipoles = model.get_monte_carlo_dipole_inputs(
+		monte_carlo_count, None, rng_to_use=rng
+	)
+
+	current_sample = sample_dipoles
+	for di, low, high in zip(dot_inputs, lows, highs):
+
+		if len(current_sample) < 1:
+			break
+		vals = pdme.util.fast_v_calc.fast_vs_for_dipoleses(
+			numpy.array([di]), current_sample
+		)
+
+		current_sample = current_sample[numpy.all((vals > low) & (vals < high), axis=1)]
+
+	for pi, plow, phigh in zip(pair_inputs, pair_lows, pair_highs):
+		if len(current_sample) < 1:
+			break
+		vals = pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal_dipoleses(
+			numpy.array([pi]), current_sample
+		)
+
+		current_sample = current_sample[
+			numpy.all(
+				((vals > plow) & (vals < phigh)) | ((vals < plow) & (vals > phigh)),
+				axis=1,
+			)
+		]
+	return len(current_sample)
 
 
 def get_a_result_fast_filter(input) -> int:
@@ -89,6 +135,9 @@ class RealSpectrumRun:
 		initial_seed: int = 12345,
 		use_fast_filter: bool = True,
 		cap_core_count: int = 0,
+		pair_measurements: Optional[
+			Sequence[pdme.measurement.DotPairRangeMeasurement]
+		] = None,
 	) -> None:
 		self.measurements = measurements
 		self.dot_inputs = [(measure.r, measure.f) for measure in self.measurements]
@@ -96,6 +145,21 @@ class RealSpectrumRun:
 		self.dot_inputs_array = pdme.measurement.input_types.dot_inputs_to_array(
 			self.dot_inputs
 		)
+
+		if pair_measurements is not None:
+			self.pair_measurements = pair_measurements
+			self.use_pair_measurements = True
+			self.dot_pair_inputs = [
+				(measure.r1, measure.r2, measure.f)
+				for measure in self.pair_measurements
+			]
+			self.dot_pair_inputs_array = (
+				pdme.measurement.input_types.dot_pair_inputs_to_array(
+					self.dot_pair_inputs
+				)
+			)
+		else:
+			self.use_pair_measurements = False
 
 		self.models = [model for (_, model) in models_with_names]
 		self.model_names = [name for (name, _) in models_with_names]
@@ -138,6 +202,16 @@ class RealSpectrumRun:
 			self.measurements
 		)
 
+		pair_lows = None
+		pair_highs = None
+		if self.use_pair_measurements:
+			(
+				pair_lows,
+				pair_highs,
+			) = pdme.measurement.input_types.dot_range_measurements_low_high_arrays(
+				self.pair_measurements
+			)
+
 		# define a new seed sequence for each run
 		seed_sequence = numpy.random.SeedSequence(self.initial_seed)
 
@@ -168,27 +242,49 @@ class RealSpectrumRun:
 					# that way we get more stuff.
 					seeds = seed_sequence.spawn(self.monte_carlo_cycles)
 
-					if self.use_fast_filter:
-						result_func = get_a_result_fast_filter
-					else:
-						result_func = get_a_result
-					current_success = sum(
-						pool.imap_unordered(
-							result_func,
-							[
-								(
-									model,
-									self.dot_inputs_array,
-									lows,
-									highs,
-									self.monte_carlo_count,
-									seed,
-								)
-								for seed in seeds
-							],
-							self.chunksize,
+					if self.use_pair_measurements:
+						current_success = sum(
+							pool.imap_unordered(
+								get_a_result_fast_filter_pairs,
+								[
+									(
+										model,
+										self.dot_inputs_array,
+										lows,
+										highs,
+										self.dot_pair_inputs_array,
+										pair_lows,
+										pair_highs,
+										self.monte_carlo_count,
+										seed,
+									)
+									for seed in seeds
+								],
+								self.chunksize,
+							)
 						)
-					)
+					else:
+						if self.use_fast_filter:
+							result_func = get_a_result_fast_filter
+						else:
+							result_func = get_a_result
+						current_success = sum(
+							pool.imap_unordered(
+								result_func,
+								[
+									(
+										model,
+										self.dot_inputs_array,
+										lows,
+										highs,
+										self.monte_carlo_count,
+										seed,
+									)
+									for seed in seeds
+								],
+								self.chunksize,
+							)
+						)
 
 					cycle_success += current_success
 					_logger.debug(f"current running successes: {cycle_success}")
