@@ -20,18 +20,6 @@ CHUNKSIZE = 50
 _logger = logging.getLogger(__name__)
 
 
-def get_a_result(input) -> int:
-	model, dot_inputs, lows, highs, monte_carlo_count, seed = input
-
-	rng = numpy.random.default_rng(seed)
-	# TODO: A long term refactor is to pull the frequency stuff out from here. The None stands for max_frequency, which is unneeded in the actually useful models.
-	sample_dipoles = model.get_monte_carlo_dipole_inputs(
-		monte_carlo_count, None, rng_to_use=rng
-	)
-	vals = pdme.util.fast_v_calc.fast_vs_for_dipoleses(dot_inputs, sample_dipoles)
-	return numpy.count_nonzero(pdme.util.fast_v_calc.between(vals, lows, highs))
-
-
 def get_a_result_fast_filter_pairs(input) -> int:
 	(
 		model,
@@ -133,7 +121,6 @@ class RealSpectrumRun:
 		max_monte_carlo_cycles_steps: int = 10,
 		chunksize: int = CHUNKSIZE,
 		initial_seed: int = 12345,
-		use_fast_filter: bool = True,
 		cap_core_count: int = 0,
 		pair_measurements: Optional[
 			Sequence[pdme.measurement.DotPairRangeMeasurement]
@@ -181,10 +168,9 @@ class RealSpectrumRun:
 		self.probabilities = [1 / self.model_count] * self.model_count
 
 		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-		self.use_fast_filter = use_fast_filter
-		ff_string = "no_fast_filter"
-		if self.use_fast_filter:
-			ff_string = "fast_filter"
+
+		ff_string = "fast_filter"
+
 		self.filename = f"{timestamp}-{filename_slug}.realdata.{ff_string}.bayesrun.csv"
 		self.initial_seed = initial_seed
 
@@ -264,13 +250,10 @@ class RealSpectrumRun:
 							)
 						)
 					else:
-						if self.use_fast_filter:
-							result_func = get_a_result_fast_filter
-						else:
-							result_func = get_a_result
+
 						current_success = sum(
 							pool.imap_unordered(
-								result_func,
+								get_a_result_fast_filter,
 								[
 									(
 										model,
