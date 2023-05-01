@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.7...0.7.0) (2023-05-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* removes fastfilter parameter because it should never be needed
+
+### Features
+
+* adds pair capability to real spectrum run hopefully ([a089951](https://gitea.deepak.science:2222/physics/deepdog/commit/a089951bbefcd8a0b2efeb49b7a8090412cbb23d))
+* removes fastfilter parameter because it should never be needed ([a015daf](https://gitea.deepak.science:2222/physics/deepdog/commit/a015daf5ff6fa5f6155c8d7e02981b588840a5b0))
+
 ### [0.6.7](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.6...0.6.7) (2023-04-14)
 
 
