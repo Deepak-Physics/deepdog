@@ -194,12 +194,13 @@ class BayesRunWithSubspaceSimulation:
 			likelihoods: List[float] = []
 
 			for (name, result) in zip(self.model_names, results):
-				clamped_likelihood = result.over_target_likelihood
 				if result.over_target_likelihood is None:
 					clamped_likelihood = result.probs_list[-1][0] / CLAMPING_FACTOR
-					_logger.warning(f"got a none result, clamping to {}")
+					_logger.warning(f"got a none result, clamping to {clamped_likelihood}")
+				else:
+					clamped_likelihood = result.over_target_likelihood
 				likelihoods.append(clamped_likelihood)
-				row[f"{name}_likelihood"] = result.clamped
+				row[f"{name}_likelihood"] = clamped_likelihood
 
 			success_weight = sum(
 				[
