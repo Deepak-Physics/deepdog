@@ -192,6 +192,9 @@ class BayesRunWithSubspaceSimulation:
 			likelihoods: List[float] = []
 
 			for (name, result) in zip(self.model_names, results):
+				if result.over_target_likelihood is None:
+					_logger.error("got a none result, bye")
+					return
 				likelihoods.append(result.over_target_likelihood)
 				row[f"{name}_likelihood"] = result.over_target_likelihood
 

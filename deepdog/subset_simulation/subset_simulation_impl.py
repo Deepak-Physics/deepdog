@@ -114,7 +114,7 @@ class SubsetSimulation:
 		mcmc_rng = numpy.random.default_rng(self.mcmc_seed)
 
 		for i in range(self.m_max):
-			next_seeds = all_chains[-self.n_c :]
+			next_seeds = all_chains[-self.n_c:]
 
 			for cost_index, cost_chain in enumerate(all_chains[: -self.n_c]):
 				probs_list.append(
