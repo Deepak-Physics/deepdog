@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.2](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.1...0.7.2) (2023-07-24)
+
+
+### Features
+
+* clamps results now ([9bb8fc5](https://gitea.deepak.science:2222/physics/deepdog/commit/9bb8fc50fe1bd1a285a333c5a396bfb6ac3176cf))
+
+
+### Bug Fixes
+
+* fixes clamping format etc. ([a170a3c](https://gitea.deepak.science:2222/physics/deepdog/commit/a170a3ce01adcec356e5aaab9abcc0ec4accd64b))
+
 ### [0.7.1](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.0...0.7.1) (2023-07-24)
 
 
