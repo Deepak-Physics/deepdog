@@ -20,6 +20,8 @@ CHUNKSIZE = 50
 DotInput = Tuple[numpy.typing.ArrayLike, float]
 
 
+CLAMPING_FACTOR = 10
+
 _logger = logging.getLogger(__name__)
 
 
@@ -192,11 +194,12 @@ class BayesRunWithSubspaceSimulation:
 			likelihoods: List[float] = []
 
 			for (name, result) in zip(self.model_names, results):
+				clamped_likelihood = result.over_target_likelihood
 				if result.over_target_likelihood is None:
-					_logger.error("got a none result, bye")
-					return
-				likelihoods.append(result.over_target_likelihood)
-				row[f"{name}_likelihood"] = result.over_target_likelihood
+					clamped_likelihood = result.probs_list[-1][0] / CLAMPING_FACTOR
+					_logger.warning(f"got a none result, clamping to {}")
+				likelihoods.append(clamped_likelihood)
+				row[f"{name}_likelihood"] = result.clamped
 
 			success_weight = sum(
 				[
