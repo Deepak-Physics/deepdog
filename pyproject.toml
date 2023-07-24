@@ -5,8 +5,8 @@ description = ""
 authors = ["Deepak Mallubhotla <dmallubhotla+github@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8,<3.10"
-pdme = "^0.8.6"
+python = ">=3.8.1,<3.10"
+pdme = "^0.9.1"
 numpy = "1.22.3"
 scipy = "1.10"
 
