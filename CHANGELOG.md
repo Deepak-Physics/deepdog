@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.0...0.7.1) (2023-07-24)
+
+
+### Features
+
+* adds subset simulation stuff ([33cab9a](https://gitea.deepak.science:2222/physics/deepdog/commit/33cab9ab4179cec13ae9e591a8ffc32df4dda989))
+
 ## [0.7.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.6.7...0.7.0) (2023-05-01)
 
 
