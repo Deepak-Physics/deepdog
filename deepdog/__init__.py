@@ -6,6 +6,7 @@ from deepdog.real_spectrum_run import RealSpectrumRun
 from deepdog.temp_aware_real_spectrum_run import TempAwareRealSpectrumRun
 from deepdog.bayes_run_with_ss import BayesRunWithSubspaceSimulation
 
+
 def get_version():
 	return __version__
 

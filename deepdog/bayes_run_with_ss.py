@@ -8,7 +8,6 @@ import pdme.util.fast_nonlocal_spectrum
 from typing import Sequence, Tuple, List, Optional
 import datetime
 import csv
-import multiprocessing
 import logging
 import numpy
 import numpy.typing
@@ -55,7 +54,7 @@ class BayesRunWithSubspaceSimulation:
 		filename_slug: str,
 		max_frequency: float = 20,
 		end_threshold: float = None,
-		run_count = 100,
+		run_count=100,
 		chunksize: int = CHUNKSIZE,
 		ss_n_c: int = 500,
 		ss_n_s: int = 100,
@@ -119,7 +118,7 @@ class BayesRunWithSubspaceSimulation:
 				raise ValueError(
 					f"end_threshold should be between 0 and 1, but is actually {end_threshold}"
 				)
-		
+
 		self.ss_n_c = ss_n_c
 		self.ss_n_s = ss_n_s
 		self.ss_m_max = ss_m_max
@@ -145,10 +144,7 @@ class BayesRunWithSubspaceSimulation:
 			# Generate the actual dipoles
 			actual_dipoles = self.actual_model.get_dipoles(self.max_frequency)
 
-			measurements = actual_dipoles.get_dot_measurements(
-				self.dot_inputs
-			)
-
+			measurements = actual_dipoles.get_dot_measurements(self.dot_inputs)
 
 			_logger.info(f"Going to work on dipole at {actual_dipoles.dipoles}")
 

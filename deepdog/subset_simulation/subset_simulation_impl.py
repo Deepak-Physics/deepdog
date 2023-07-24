@@ -3,7 +3,6 @@ import numpy
 import pdme.measurement
 import pdme.measurement.input_types
 import pdme.subspace_simulation
-import bisect
 from typing import Sequence, Tuple, Optional
 
 from dataclasses import dataclass
@@ -71,11 +70,11 @@ class SubsetSimulation:
 		self.default_w_log_step = default_w_log_step
 		self.default_upper_w_log_step = default_upper_w_log_step
 
-		_logger.info(f"using params:")
+		_logger.info("using params:")
 		_logger.info(f"\tn_c: {self.n_c}")
 		_logger.info(f"\tn_s: {self.n_s}")
 		_logger.info(f"\tm: {self.m_max}")
-		_logger.info(f"let's do level 0...")
+		_logger.info("let's do level 0...")
 
 		self.target_cost = target_cost
 		_logger.info(f"will stop at target cost {target_cost}")
