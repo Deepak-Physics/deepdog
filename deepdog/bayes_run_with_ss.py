@@ -71,6 +71,7 @@ class BayesRunWithSubspaceSimulation:
 		ss_default_w_log_step=0.01,
 		ss_default_upper_w_log_step=4,
 		ss_dump_last_generation=False,
+		write_output_to_bayesruncsv=True,
 	) -> None:
 		self.dot_inputs = pdme.inputs.inputs_with_frequency_range(
 			dot_positions, frequency_range
@@ -138,10 +139,18 @@ class BayesRunWithSubspaceSimulation:
 
 		self.run_count = run_count
 
-	def go(self) -> None:
-		with open(self.filename, "a", newline="") as outfile:
-			writer = csv.DictWriter(outfile, fieldnames=self.csv_fields, dialect="unix")
-			writer.writeheader()
+		self.write_output_to_csv = write_output_to_bayesruncsv
+
+	def go(self) -> Sequence:
+
+		if self.write_output_to_csv:
+			with open(self.filename, "a", newline="") as outfile:
+				writer = csv.DictWriter(
+					outfile, fieldnames=self.csv_fields, dialect="unix"
+				)
+				writer.writeheader()
+
+		return_result = []
 
 		for run in range(1, self.run_count + 1):
 
@@ -222,12 +231,14 @@ class BayesRunWithSubspaceSimulation:
 			for name, probability in zip(self.model_names, self.probabilities):
 				row[f"{name}_prob"] = probability
 			_logger.info(row)
+			return_result.append(row)
 
-			with open(self.filename, "a", newline="") as outfile:
-				writer = csv.DictWriter(
-					outfile, fieldnames=self.csv_fields, dialect="unix"
-				)
-				writer.writerow(row)
+			if self.write_output_to_csv:
+				with open(self.filename, "a", newline="") as outfile:
+					writer = csv.DictWriter(
+						outfile, fieldnames=self.csv_fields, dialect="unix"
+					)
+					writer.writerow(row)
 
 			if self.use_end_threshold:
 				max_prob = max(self.probabilities)
@@ -236,3 +247,5 @@ class BayesRunWithSubspaceSimulation:
 						f"Aborting early, because {max_prob} is greater than {self.end_threshold}"
 					)
 					break
+
+		return return_result

@@ -93,6 +93,14 @@ optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 
 [[package]]
+name = "colored"
+version = "1.4.4"
+description = "Simple library for color and formatting to terminal"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "coverage"
 version = "7.2.7"
 description = "Code coverage measurement for Python"
@@ -634,6 +642,18 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "syrupy"
+version = "4.0.8"
+description = "Pytest Snapshot Test Utility"
+category = "dev"
+optional = false
+python-versions = ">=3.8.1,<4"
+
+[package.dependencies]
+colored = ">=1.3.92,<2.0.0"
+pytest = ">=7.0.0,<8.0.0"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -730,7 +750,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.1,<3.10"
-content-hash = "111972d04616ce3ddfc9039a0b38c7eb7c4a41f10390139b27e958aedac7e979"
+content-hash = "e1531b1493bac50ffe5e8f9a46a64d9b66198f7021f6d643c72f21cb53dc77ec"
 
 [metadata.files]
 black = []
@@ -741,6 +761,7 @@ charset-normalizer = []
 click = []
 click-log = []
 colorama = []
+colored = []
 coverage = []
 cryptography = []
 docutils = []
@@ -786,6 +807,7 @@ secretstorage = []
 semver = []
 six = []
 smmap = []
+syrupy = []
 tomli = []
 tomlkit = []
 tqdm = []
