@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.4](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.3...0.7.4) (2023-07-27)
+
+
+### Features
+
+* adds configurable chunk size for the initial mc level 0 SS stage cost calculation to reduce memory usage ([9a7a3ff](https://gitea.deepak.science:2222/physics/deepdog/commit/9a7a3ff2c7ebe81d5e10647ce39844c372ff7b07))
+* allows for deepdog bayesrun with ss to not print csv to make snapshot testing possible ([8e6ead4](https://gitea.deepak.science:2222/physics/deepdog/commit/8e6ead416c9eba56f568f648d0df44caaa510cfe))
+
+
+### Bug Fixes
+
+* fixes bug if case of clamping necessary ([161bcf4](https://gitea.deepak.science:2222/physics/deepdog/commit/161bcf42addf331661c3929073688b9f2c13502c))
+* fixes bug with clamped probabilities being underestimated ([e6defc7](https://gitea.deepak.science:2222/physics/deepdog/commit/e6defc794871a48ac331023eb477bd235b78d6d0))
+
 ### [0.7.3](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.2...0.7.3) (2023-07-27)
 
 
