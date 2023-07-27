@@ -40,6 +40,7 @@ class SubsetSimulation:
 		default_upper_w_log_step=4,
 		keep_probs_list=True,
 		dump_last_generation_to_file=False,
+		initial_cost_chunk_size=100,
 	):
 		name, model = model_name_pair
 		self.model_name = name
@@ -85,6 +86,8 @@ class SubsetSimulation:
 		self.keep_probs_list = keep_probs_list
 		self.dump_last_generations = dump_last_generation_to_file
 
+		self.initial_cost_chunk_size = initial_cost_chunk_size
+
 	def execute(self) -> SubsetSimulationResult:
 
 		probs_list = []
@@ -96,7 +99,14 @@ class SubsetSimulation:
 		)
 		# _logger.debug(sample_dipoles)
 		# _logger.debug(sample_dipoles.shape)
-		costs = self.cost_function_to_use(sample_dipoles)
+
+		raw_costs = []
+		_logger.debug(f"Using iterated cost function thing with chunk size {self.initial_cost_chunk_size}")
+
+		for x in range(0, len(sample_dipoles), self.initial_cost_chunk_size):
+			_logger.debug(f"doing chunk {x}")
+			raw_costs.extend(self.cost_function_to_use(sample_dipoles[x: x + self.initial_cost_chunk_size]))
+		costs = numpy.array(raw_costs)
 
 		_logger.debug(f"costs: {costs}")
 		sorted_indexes = costs.argsort()[::-1]

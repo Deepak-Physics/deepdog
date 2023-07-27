@@ -71,6 +71,7 @@ class BayesRunWithSubspaceSimulation:
 		ss_default_w_log_step=0.01,
 		ss_default_upper_w_log_step=4,
 		ss_dump_last_generation=False,
+		ss_initial_costs_chunk_size=100,
 		write_output_to_bayesruncsv=True,
 	) -> None:
 		self.dot_inputs = pdme.inputs.inputs_with_frequency_range(
@@ -136,7 +137,7 @@ class BayesRunWithSubspaceSimulation:
 		self.ss_default_w_log_step = ss_default_w_log_step
 		self.ss_default_upper_w_log_step = ss_default_upper_w_log_step
 		self.ss_dump_last_generation = ss_dump_last_generation
-
+		self.ss_initial_costs_chunk_size = ss_initial_costs_chunk_size
 		self.run_count = run_count
 
 		self.write_output_to_csv = write_output_to_bayesruncsv
@@ -183,6 +184,7 @@ class BayesRunWithSubspaceSimulation:
 					self.ss_default_r_step,
 					self.ss_default_w_log_step,
 					self.ss_default_upper_w_log_step,
+					initial_cost_chunk_size=self.ss_initial_costs_chunk_size,
 					keep_probs_list=False,
 					dump_last_generation_to_file=self.ss_dump_last_generation,
 				)
