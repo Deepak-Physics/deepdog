@@ -148,11 +148,12 @@ class SubsetSimulation:
 
 			stdevs = self.get_stdevs_from_arrays(next_seeds_as_array)
 			_logger.info(f"got stdevs: {stdevs.stdevs}")
-
+			_logger.debug("Starting the MCMC")
 			all_chains = []
-			for c, s in next_seeds:
+			for seed_index, (c, s) in enumerate(next_seeds):
 				# chain = mcmc(s, threshold_cost, n_s, model, dot_inputs_array, actual_measurement_array, mcmc_rng, curr_cost=c, stdevs=stdevs)
 				# until new version gotta do
+				_logger.debug(f"\t{seed_index}: getting another chain from the next seed")
 				chain = self.model.get_mcmc_chain(
 					s,
 					self.cost_function_to_use,
@@ -168,10 +169,11 @@ class SubsetSimulation:
 					except IndexError:
 						filtered_cost = cost
 					all_chains.append((filtered_cost, chained))
-
+			_logger.debug("finished mcmc")
 			# _logger.debug(all_chains)
 
 			all_chains.sort(key=lambda c: c[0], reverse=True)
+			_logger.debug("finished sorting all_chains")
 
 			threshold_cost = all_chains[-self.n_c][0]
 			_logger.info(
