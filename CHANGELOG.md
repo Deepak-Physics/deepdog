@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.3](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.2...0.7.3) (2023-07-27)
+
+
+### Features
+
+* adds utility options and avoids memory leak ([598dad1](https://gitea.deepak.science:2222/physics/deepdog/commit/598dad1e6dc8fc0b7a5b4a90c8e17bf744e8d98c))
+
 ### [0.7.2](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.1...0.7.2) (2023-07-24)
 
 

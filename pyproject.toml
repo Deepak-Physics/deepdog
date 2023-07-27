@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "deepdog"
-version = "0.7.2"
+version = "0.7.3"
 description = ""
 authors = ["Deepak Mallubhotla <dmallubhotla+github@gmail.com>"]
 
