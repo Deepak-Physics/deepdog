@@ -127,8 +127,11 @@ class SubsetSimulation:
 				next_dipoles_seed_dipoles = numpy.array([n[1] for n in next_seeds])
 				for n in range(self.model.n):
 					_logger.info(f"{next_dipoles_seed_dipoles[:, n].shape}")
-					numpy.savetxt(f"generation_{self.n_c}_{self.n_s}_{i}_dipole_{n}.csv", next_dipoles_seed_dipoles[:, n], delimiter=",")
-
+					numpy.savetxt(
+						f"generation_{self.n_c}_{self.n_s}_{i}_dipole_{n}.csv",
+						next_dipoles_seed_dipoles[:, n],
+						delimiter=",",
+					)
 
 			if self.keep_probs_list:
 				for cost_index, cost_chain in enumerate(all_chains[: -self.n_c]):
@@ -187,7 +190,10 @@ class SubsetSimulation:
 					if self.keep_probs_list:
 						probs_list.append(
 							(
-								((self.n_c * self.n_s - cost_index) / (self.n_c * self.n_s))
+								(
+									(self.n_c * self.n_s - cost_index)
+									/ (self.n_c * self.n_s)
+								)
 								/ (self.n_s ** (i)),
 								cost_chain[0],
 								i + 1,
@@ -234,7 +240,7 @@ class SubsetSimulation:
 		# 	_logger.info(f"\t{prob}: {prob_cost}")
 		probs_list.sort(key=lambda c: c[0], reverse=True)
 
-		min_likelihood = ((1) / (self.n_c * self.n_s))/ (self.n_s ** (self.m_max + 1))
+		min_likelihood = ((1) / (self.n_c * self.n_s)) / (self.n_s ** (self.m_max + 1))
 
 		result = SubsetSimulationResult(
 			probs_list=probs_list,
