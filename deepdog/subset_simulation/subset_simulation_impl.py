@@ -17,6 +17,7 @@ class SubsetSimulationResult:
 	over_target_likelihood: Optional[float]
 	under_target_cost: Optional[float]
 	under_target_likelihood: Optional[float]
+	lowest_likelihood: Optional[float]
 
 
 class SubsetSimulation:
@@ -37,6 +38,8 @@ class SubsetSimulation:
 		default_r_step=0.01,
 		default_w_log_step=0.01,
 		default_upper_w_log_step=4,
+		keep_probs_list=True,
+		dump_last_generation_to_file=False,
 	):
 		name, model = model_name_pair
 		self.model_name = name
@@ -79,6 +82,9 @@ class SubsetSimulation:
 		self.target_cost = target_cost
 		_logger.info(f"will stop at target cost {target_cost}")
 
+		self.keep_probs_list = keep_probs_list
+		self.dump_last_generations = dump_last_generation_to_file
+
 	def execute(self) -> SubsetSimulationResult:
 
 		probs_list = []
@@ -116,15 +122,24 @@ class SubsetSimulation:
 		for i in range(self.m_max):
 			next_seeds = all_chains[-self.n_c:]
 
-			for cost_index, cost_chain in enumerate(all_chains[: -self.n_c]):
-				probs_list.append(
-					(
-						((self.n_c * self.n_s - cost_index) / (self.n_c * self.n_s))
-						/ (self.n_s ** (i)),
-						cost_chain[0],
-						i + 1,
+			if self.dump_last_generations:
+				_logger.info("writing out csv file")
+				next_dipoles_seed_dipoles = numpy.array([n[1] for n in next_seeds])
+				for n in range(self.model.n):
+					_logger.info(f"{next_dipoles_seed_dipoles[:, n].shape}")
+					numpy.savetxt(f"generation_{self.n_c}_{self.n_s}_{i}_dipole_{n}.csv", next_dipoles_seed_dipoles[:, n], delimiter=",")
+
+
+			if self.keep_probs_list:
+				for cost_index, cost_chain in enumerate(all_chains[: -self.n_c]):
+					probs_list.append(
+						(
+							((self.n_c * self.n_s - cost_index) / (self.n_c * self.n_s))
+							/ (self.n_s ** (i)),
+							cost_chain[0],
+							i + 1,
+						)
 					)
-				)
 
 			next_seeds_as_array = numpy.array([s for _, s in next_seeds])
 
@@ -169,14 +184,15 @@ class SubsetSimulation:
 
 				shorter_probs_list = []
 				for cost_index, cost_chain in enumerate(all_chains):
-					probs_list.append(
-						(
-							((self.n_c * self.n_s - cost_index) / (self.n_c * self.n_s))
-							/ (self.n_s ** (i)),
-							cost_chain[0],
-							i + 1,
+					if self.keep_probs_list:
+						probs_list.append(
+							(
+								((self.n_c * self.n_s - cost_index) / (self.n_c * self.n_s))
+								/ (self.n_s ** (i)),
+								cost_chain[0],
+								i + 1,
+							)
 						)
-					)
 					shorter_probs_list.append(
 						(
 							cost_chain[0],
@@ -191,21 +207,23 @@ class SubsetSimulation:
 					over_target_likelihood=shorter_probs_list[over_index - 1][1],
 					under_target_cost=shorter_probs_list[over_index][0],
 					under_target_likelihood=shorter_probs_list[over_index][1],
+					lowest_likelihood=shorter_probs_list[-1][1],
 				)
 				return result
 
 			# _logger.debug([c[0] for c in all_chains[-n_c:]])
 			_logger.info(f"doing level {i + 1}")
 
-		for cost_index, cost_chain in enumerate(all_chains):
-			probs_list.append(
-				(
-					((self.n_c * self.n_s - cost_index) / (self.n_c * self.n_s))
-					/ (self.n_s ** (self.m_max)),
-					cost_chain[0],
-					self.m_max + 1,
+		if self.keep_probs_list:
+			for cost_index, cost_chain in enumerate(all_chains):
+				probs_list.append(
+					(
+						((self.n_c * self.n_s - cost_index) / (self.n_c * self.n_s))
+						/ (self.n_s ** (self.m_max)),
+						cost_chain[0],
+						self.m_max + 1,
+					)
 				)
-			)
 		threshold_cost = all_chains[-self.n_c][0]
 		_logger.info(
 			f"final threshold cost: {threshold_cost}, at P = (1 / {self.n_s})^{self.m_max + 1}"
@@ -215,12 +233,16 @@ class SubsetSimulation:
 		# for prob, prob_cost in probs_list:
 		# 	_logger.info(f"\t{prob}: {prob_cost}")
 		probs_list.sort(key=lambda c: c[0], reverse=True)
+
+		min_likelihood = ((1) / (self.n_c * self.n_s))/ (self.n_s ** (self.m_max + 1))
+
 		result = SubsetSimulationResult(
 			probs_list=probs_list,
 			over_target_cost=None,
 			over_target_likelihood=None,
 			under_target_cost=None,
 			under_target_likelihood=None,
+			lowest_likelihood=min_likelihood,
 		)
 		return result
 
