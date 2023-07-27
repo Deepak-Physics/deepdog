@@ -208,7 +208,11 @@ class BayesRunWithSubspaceSimulation:
 
 			for (name, result) in zip(self.model_names, results):
 				if result.over_target_likelihood is None:
-					clamped_likelihood = result.lowest_likelihood / CLAMPING_FACTOR
+					if result.lowest_likelihood is None:
+						_logger.error(f"result {result} looks bad")
+						clamped_likelihood = 10**-15
+					else:
+						clamped_likelihood = result.lowest_likelihood / CLAMPING_FACTOR
 					_logger.warning(
 						f"got a none result, clamping to {clamped_likelihood}"
 					)
