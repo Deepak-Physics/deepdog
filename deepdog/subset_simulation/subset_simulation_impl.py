@@ -120,7 +120,7 @@ class SubsetSimulation:
 		mcmc_rng = numpy.random.default_rng(self.mcmc_seed)
 
 		for i in range(self.m_max):
-			next_seeds = all_chains[-self.n_c:]
+			next_seeds = all_chains[-self.n_c :]
 
 			if self.dump_last_generations:
 				_logger.info("writing out csv file")
@@ -153,7 +153,9 @@ class SubsetSimulation:
 			for seed_index, (c, s) in enumerate(next_seeds):
 				# chain = mcmc(s, threshold_cost, n_s, model, dot_inputs_array, actual_measurement_array, mcmc_rng, curr_cost=c, stdevs=stdevs)
 				# until new version gotta do
-				_logger.debug(f"\t{seed_index}: getting another chain from the next seed")
+				_logger.debug(
+					f"\t{seed_index}: getting another chain from the next seed"
+				)
 				chain = self.model.get_mcmc_chain(
 					s,
 					self.cost_function_to_use,
@@ -242,7 +244,7 @@ class SubsetSimulation:
 		# 	_logger.info(f"\t{prob}: {prob_cost}")
 		probs_list.sort(key=lambda c: c[0], reverse=True)
 
-		min_likelihood = ((1) / (self.n_c * self.n_s)) / (self.n_s ** (self.m_max + 1))
+		min_likelihood = ((1) / (self.n_c * self.n_s)) / (self.n_s ** (self.m_max))
 
 		result = SubsetSimulationResult(
 			probs_list=probs_list,
