@@ -18,7 +18,7 @@ test() {
 
 fmt() {
 	poetry run black .
-	find . -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
+	find . -not \( -path "./.*" -type d -prune \) -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
 }
 
 release() {
