@@ -73,6 +73,7 @@ class BayesRunWithSubspaceSimulation:
 		ss_dump_last_generation=False,
 		ss_initial_costs_chunk_size=100,
 		write_output_to_bayesruncsv=True,
+		use_timestamp_for_output=True,
 	) -> None:
 		self.dot_inputs = pdme.inputs.inputs_with_frequency_range(
 			dot_positions, frequency_range
@@ -110,8 +111,11 @@ class BayesRunWithSubspaceSimulation:
 
 		self.probabilities = [1 / self.model_count] * self.model_count
 
-		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-		self.filename = f"{timestamp}-{filename_slug}.bayesrunwithss.csv"
+		if use_timestamp_for_output:
+			timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+			self.filename = f"{timestamp}-{filename_slug}.bayesrunwithss.csv"
+		else:
+			self.filename = f"{filename_slug}.bayesrunwithss.csv"
 		self.max_frequency = max_frequency
 
 		if end_threshold is not None:
