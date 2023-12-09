@@ -18,6 +18,7 @@ class DirectMonteCarloResult:
 	monte_carlo_count: int
 	likelihood: float
 
+
 @dataclass
 class DirectMonteCarloConfig:
 	monte_carlo_count_per_cycle: int = 10000
@@ -27,6 +28,7 @@ class DirectMonteCarloConfig:
 	monte_carlo_seed: int = 1234
 	write_successes_to_file: bool = False
 	tag: str = ""
+
 
 class DirectMonteCarloRun:
 	"""
@@ -52,7 +54,7 @@ class DirectMonteCarloRun:
 	target_success: int
 	The number of successes to target before exiting early.
 	Should likely be ~100 but can go higher to.
-	
+
 	max_monte_carlo_cycles_steps: int
 	The number of steps to use. Each step consists of monte_carlo_cycles cycles, each of which has monte_carlo_count_per_cycle iterations.
 
@@ -82,6 +84,7 @@ class DirectMonteCarloRun:
 		) = pdme.measurement.input_types.dot_range_measurements_low_high_arrays(
 			self.measurements
 		)
+
 	def _single_run(self, seed) -> numpy.ndarray:
 		rng = numpy.random.default_rng(seed)
 
@@ -98,7 +101,9 @@ class DirectMonteCarloRun:
 				numpy.array([di]), current_sample
 			)
 
-			current_sample = current_sample[numpy.all((vals > low) & (vals < high), axis=1)]
+			current_sample = current_sample[
+				numpy.all((vals > low) & (vals < high), axis=1)
+			]
 		return current_sample
 
 	def execute(self) -> DirectMonteCarloResult:
@@ -106,23 +111,30 @@ class DirectMonteCarloRun:
 		total_success = 0
 		total_count = 0
 
-		count_per_step = self.config.monte_carlo_count_per_cycle * self.config.monte_carlo_cycles
+		count_per_step = (
+			self.config.monte_carlo_count_per_cycle * self.config.monte_carlo_cycles
+		)
 		seed_sequence = numpy.random.SeedSequence(self.config.monte_carlo_seed)
-		while (
-			(step_count < self.config.max_monte_carlo_cycles_steps) and 
-			(total_success < self.config.target_success)
+		while (step_count < self.config.max_monte_carlo_cycles_steps) and (
+			total_success < self.config.target_success
 		):
 			_logger.debug(f"Executing step {step_count}")
-			for cycle_i, seed in enumerate(seed_sequence.spawn(self.config.monte_carlo_cycles)):
+			for cycle_i, seed in enumerate(
+				seed_sequence.spawn(self.config.monte_carlo_cycles)
+			):
 				cycle_success_configs = self._single_run(seed)
 				cycle_success_count = len(cycle_success_configs)
 				if cycle_success_count > 0:
-					_logger.debug(f"For cycle {cycle_i} received {cycle_success_count} successes")
+					_logger.debug(
+						f"For cycle {cycle_i} received {cycle_success_count} successes"
+					)
 					_logger.debug(cycle_success_configs)
 					if self.config.write_successes_to_file:
 						sorted_by_freq = numpy.array(
 							[
-								pdme.subspace_simulation.sort_array_of_dipoles_by_frequency(dipole_config)
+								pdme.subspace_simulation.sort_array_of_dipoles_by_frequency(
+									dipole_config
+								)
 								for dipole_config in cycle_success_configs
 							]
 						)
@@ -137,10 +149,9 @@ class DirectMonteCarloRun:
 			_logger.debug(f"At end of step {step_count} have {total_success} successes")
 			step_count += 1
 			total_count += count_per_step
-			
 
 		return DirectMonteCarloResult(
 			successes=total_success,
 			monte_carlo_count=total_count,
-			likelihood=total_success/total_count
+			likelihood=total_success / total_count,
 		)

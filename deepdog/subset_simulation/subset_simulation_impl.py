@@ -101,11 +101,17 @@ class SubsetSimulation:
 		# _logger.debug(sample_dipoles.shape)
 
 		raw_costs = []
-		_logger.debug(f"Using iterated cost function thing with chunk size {self.initial_cost_chunk_size}")
+		_logger.debug(
+			f"Using iterated cost function thing with chunk size {self.initial_cost_chunk_size}"
+		)
 
 		for x in range(0, len(sample_dipoles), self.initial_cost_chunk_size):
 			_logger.debug(f"doing chunk {x}")
-			raw_costs.extend(self.cost_function_to_use(sample_dipoles[x: x + self.initial_cost_chunk_size]))
+			raw_costs.extend(
+				self.cost_function_to_use(
+					sample_dipoles[x : x + self.initial_cost_chunk_size]
+				)
+			)
 		costs = numpy.array(raw_costs)
 
 		_logger.debug(f"costs: {costs}")
@@ -147,13 +153,12 @@ class SubsetSimulation:
 				stdevs = self.get_stdevs_from_arrays(next_seeds_as_array)
 				_logger.info(f"got stdevs: {stdevs.stdevs}")
 				all_long_chains = []
-				for seed_index, (c, s) in enumerate(next_seeds[::len(next_seeds) // 20]):
+				for seed_index, (c, s) in enumerate(
+					next_seeds[:: len(next_seeds) // 20]
+				):
 					# chain = mcmc(s, threshold_cost, n_s, model, dot_inputs_array, actual_measurement_array, mcmc_rng, curr_cost=c, stdevs=stdevs)
 					# until new version gotta do
-					_logger.debug(
-						f"\t{seed_index}: doing long chain on the next seed"
-					)
-				
+					_logger.debug(f"\t{seed_index}: doing long chain on the next seed")
 
 					long_chain = self.model.get_mcmc_chain(
 						s,
@@ -174,7 +179,6 @@ class SubsetSimulation:
 						all_long_chains_array[:, n],
 						delimiter=",",
 					)
-
 
 			if self.keep_probs_list:
 				for cost_index, cost_chain in enumerate(all_chains[: -self.n_c]):

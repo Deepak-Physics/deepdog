@@ -151,7 +151,7 @@ def test_bayesss_with_tighter_cost(snapshot):
 		ss_default_upper_w_log_step=4,
 		ss_dump_last_generation=False,
 		write_output_to_bayesruncsv=False,
-		ss_initial_costs_chunk_size=1
+		ss_initial_costs_chunk_size=1,
 	)
 	result = square_run.go()
 
