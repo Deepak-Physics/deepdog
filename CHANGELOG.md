@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.5](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.4...0.7.5) (2023-12-09)
+
+
+### Features
+
+* adds direct monte carlo package ([1741807](https://gitea.deepak.science:2222/physics/deepdog/commit/1741807be43d08fb51bc94518dd3b67585c04c20))
+* adds longchain logging if logging last generation ([b4e5f53](https://gitea.deepak.science:2222/physics/deepdog/commit/b4e5f5372682fc64c3734a96c4a899e018f127ce))
+* allows disabling timestamp in subset simulation bayes results ([9a4548d](https://gitea.deepak.science:2222/physics/deepdog/commit/9a4548def45a01f1f518135d4237c3dc09dcc342))
+
 ### [0.7.4](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.3...0.7.4) (2023-07-27)
 
 
