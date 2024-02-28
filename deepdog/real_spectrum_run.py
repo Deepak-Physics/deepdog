@@ -66,6 +66,42 @@ def get_a_result_fast_filter_pairs(input) -> int:
 	return len(current_sample)
 
 
+def get_a_result_fast_filter_pair_phase_only(input) -> int:
+	(
+		model,
+		pair_inputs,
+		pair_phase_lows,
+		pair_phase_highs,
+		monte_carlo_count,
+		seed,
+	) = input
+
+	rng = numpy.random.default_rng(seed)
+	# TODO: A long term refactor is to pull the frequency stuff out from here. The None stands for max_frequency, which is unneeded in the actually useful models.
+	sample_dipoles = model.get_monte_carlo_dipole_inputs(
+		monte_carlo_count, None, rng_to_use=rng
+	)
+
+	current_sample = sample_dipoles
+
+	for pi, plow, phigh in zip(pair_inputs, pair_phase_lows, pair_phase_highs):
+		if len(current_sample) < 1:
+			break
+		vals = pdme.util.fast_nonlocal_spectrum.signarg(
+			pdme.util.fast_nonlocal_spectrum.fast_s_nonlocal_dipoleses(
+				numpy.array([pi]), current_sample
+			)
+		)
+
+		current_sample = current_sample[
+			numpy.all(
+				((vals > plow) & (vals < phigh)) | ((vals < plow) & (vals > phigh)),
+				axis=1,
+			)
+		]
+	return len(current_sample)
+
+
 def get_a_result_fast_filter(input) -> int:
 	model, dot_inputs, lows, highs, monte_carlo_count, seed = input
 
@@ -108,6 +144,11 @@ class RealSpectrumRun:
 
 	run_count: int
 	The number of runs to do.
+
+	If pair_measurements is not None, uses pair measurement method (and single measurements too).
+	If pair_phase_measurements is not None, ignores measurements and uses phase measurements _only_
+	This is lazy design on my part.
+
 	"""
 
 	def __init__(
@@ -125,6 +166,9 @@ class RealSpectrumRun:
 		pair_measurements: Optional[
 			Sequence[pdme.measurement.DotPairRangeMeasurement]
 		] = None,
+		pair_phase_measurements: Optional[
+			Sequence[pdme.measurement.DotPairRangeMeasurement]
+		] = None,
 	) -> None:
 		self.measurements = measurements
 		self.dot_inputs = [(measure.r, measure.f) for measure in self.measurements]
@@ -136,6 +180,8 @@ class RealSpectrumRun:
 		if pair_measurements is not None:
 			self.pair_measurements = pair_measurements
 			self.use_pair_measurements = True
+			self.use_pair_phase_measurements = False
+
 			self.dot_pair_inputs = [
 				(measure.r1, measure.r2, measure.f)
 				for measure in self.pair_measurements
@@ -145,8 +191,14 @@ class RealSpectrumRun:
 					self.dot_pair_inputs
 				)
 			)
+		elif pair_phase_measurements is not None:
+			self.use_pair_measurements = False
+			self.use_pair_phase_measurements = True
+			self.pair_phase_measurements = pair_phase_measurements
+
 		else:
 			self.use_pair_measurements = False
+			self.use_pair_phase_measurements = False
 
 		self.models = [model for (_, model) in models_with_names]
 		self.model_names = [name for (name, _) in models_with_names]
@@ -198,6 +250,16 @@ class RealSpectrumRun:
 				self.pair_measurements
 			)
 
+		pair_phase_lows = None
+		pair_phase_highs = None
+		if self.use_pair_phase_measurements:
+			(
+				pair_phase_lows,
+				pair_phase_highs,
+			) = pdme.measurement.input_types.dot_range_measurements_low_high_arrays(
+				self.pair_phase_measurements
+			)
+
 		# define a new seed sequence for each run
 		seed_sequence = numpy.random.SeedSequence(self.initial_seed)
 
@@ -241,6 +303,24 @@ class RealSpectrumRun:
 										self.dot_pair_inputs_array,
 										pair_lows,
 										pair_highs,
+										self.monte_carlo_count,
+										seed,
+									)
+									for seed in seeds
+								],
+								self.chunksize,
+							)
+						)
+					elif self.use_pair_phase_measurements:
+						current_success = sum(
+							pool.imap_unordered(
+								get_a_result_fast_filter_pairs,
+								[
+									(
+										model,
+										self.dot_pair_inputs_array,
+										pair_phase_lows,
+										pair_phase_highs,
 										self.monte_carlo_count,
 										seed,
 									)
