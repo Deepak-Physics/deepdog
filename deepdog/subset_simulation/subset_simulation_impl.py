@@ -215,7 +215,7 @@ class SubsetSimulation:
 				for cost, chained in chain:
 					try:
 						filtered_cost = cost[0]
-					except IndexError:
+					except (IndexError, TypeError):
 						filtered_cost = cost
 					all_chains.append((filtered_cost, chained))
 			_logger.debug("finished mcmc")
