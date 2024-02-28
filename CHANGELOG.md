@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.6](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.5...0.7.6) (2024-02-28)
+
+
+### Features
+
+* adds ability to use phase measurements only for correlations ([bb72e90](https://gitea.deepak.science:2222/physics/deepdog/commit/bb72e903d14704a3783daf2dbc1797b90880aa85))
+
+
+### Bug Fixes
+
+* fixes typeerror vs indexerror on bare float as cost in subset simulation ([65e1948](https://gitea.deepak.science:2222/physics/deepdog/commit/65e19488359d7f5656660da7da8f32ed474989c3))
+
 ### [0.7.5](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.4...0.7.5) (2023-12-09)
 
 
