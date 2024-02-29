@@ -197,7 +197,7 @@ class RealSpectrumRun:
 			self.pair_phase_measurements = pair_phase_measurements
 			self.dot_pair_inputs = [
 				(measure.r1, measure.r2, measure.f)
-				for measure in self.pair_measurements
+				for measure in self.pair_phase_measurements
 			]
 			self.dot_pair_inputs_array = (
 				pdme.measurement.input_types.dot_pair_inputs_to_array(
