@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.7](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.6...0.7.7) (2024-02-29)
+
+
+### Bug Fixes
+
+* fixes phase calculation issue with setting input array ([48e41cb](https://gitea.deepak.science:2222/physics/deepdog/commit/48e41cbd2c58d4c4d2747822d618d7d55257643d))
+
 ### [0.7.6](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.5...0.7.6) (2024-02-28)
 
 
