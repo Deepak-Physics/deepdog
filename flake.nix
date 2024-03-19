@@ -15,6 +15,11 @@
 	poetry2nix = poetry2nixSrc.lib.mkPoetry2Nix { inherit pkgs; };
       in {
         packages = {
+	  deepdogApp = poetry2nix.mkPoetryApplication {
+            projectDir = self;
+	    python = pkgs.python39;
+	    preferWheels = true;
+	  };
 	  deepdogEnv = poetry2nix.mkPoetryEnv {
 	    projectDir = self;
 	    python = pkgs.python39;
@@ -29,6 +34,8 @@
 	  buildInputs = [
 	    pkgs.poetry
 	    self.packages.${system}.deepdogEnv
+	    self.packages.${system}.deepdogApp
+	    pkgs.just
 	  ];
 	  shellHook = ''
 	    export DO_NIX_CUSTOM=1
