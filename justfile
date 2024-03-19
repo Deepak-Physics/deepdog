@@ -17,7 +17,8 @@ checknix:
 		echo "Using poetry as runner, no nix detected."
 	fi
 
-test:
+# run all tests
+test: fmt
 	#!/usr/bin/env bash
 	set -euxo pipefail
 	
@@ -33,6 +34,7 @@ test:
 		poetry run pytest
 	fi
 
+# format code
 fmt:
 	#!/usr/bin/env bash
 	set -euxo pipefail
@@ -43,6 +45,7 @@ fmt:
 	fi
 	find . -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
 
+# release the app, checking that our working tree is clean and ready for release
 release:
 	./scripts/release.sh
 
