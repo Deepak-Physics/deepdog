@@ -2,7 +2,7 @@ import pdme.model
 import pdme.measurement
 import pdme.measurement.input_types
 import pdme.subspace_simulation
-from typing import Tuple, Sequence
+from typing import Tuple, Dict, NewType, Any
 from dataclasses import dataclass
 import logging
 import numpy
@@ -28,6 +28,20 @@ class DirectMonteCarloConfig:
 	monte_carlo_seed: int = 1234
 	write_successes_to_file: bool = False
 	tag: str = ""
+
+
+# Aliasing dict as a generic data container
+DirectMonteCarloData = NewType("DirectMonteCarloData", Dict[str, Any])
+
+
+class DirectMonteCarloFilter:
+	"""
+	Abstract class for filtering out samples matching some criteria. Initialise with data as needed,
+	then filter out samples as needed.
+	"""
+
+	def filter_samples(self, samples: numpy.ndarray) -> numpy.ndarray:
+		raise NotImplementedError
 
 
 class DirectMonteCarloRun:
@@ -65,25 +79,26 @@ class DirectMonteCarloRun:
 	def __init__(
 		self,
 		model_name_pair: Tuple[str, pdme.model.DipoleModel],
-		measurements: Sequence[pdme.measurement.DotRangeMeasurement],
+		filter: DirectMonteCarloFilter,
 		config: DirectMonteCarloConfig,
 	):
 		self.model_name, self.model = model_name_pair
 
-		self.measurements = measurements
-		self.dot_inputs = [(measure.r, measure.f) for measure in self.measurements]
+		# self.measurements = measurements
+		# self.dot_inputs = [(measure.r, measure.f) for measure in self.measurements]
 
-		self.dot_inputs_array = pdme.measurement.input_types.dot_inputs_to_array(
-			self.dot_inputs
-		)
+		# self.dot_inputs_array = pdme.measurement.input_types.dot_inputs_to_array(
+		# 	self.dot_inputs
+		# )
 
 		self.config = config
-		(
-			self.lows,
-			self.highs,
-		) = pdme.measurement.input_types.dot_range_measurements_low_high_arrays(
-			self.measurements
-		)
+		self.filter = filter
+		# (
+		# 	self.lows,
+		# 	self.highs,
+		# ) = pdme.measurement.input_types.dot_range_measurements_low_high_arrays(
+		# 	self.measurements
+		# )
 
 	def _single_run(self, seed) -> numpy.ndarray:
 		rng = numpy.random.default_rng(seed)
@@ -93,18 +108,20 @@ class DirectMonteCarloRun:
 		)
 
 		current_sample = sample_dipoles
-		for di, low, high in zip(self.dot_inputs_array, self.lows, self.highs):
 
-			if len(current_sample) < 1:
-				break
-			vals = pdme.util.fast_v_calc.fast_vs_for_dipoleses(
-				numpy.array([di]), current_sample
-			)
+		return self.filter.filter_samples(current_sample)
+		# for di, low, high in zip(self.dot_inputs_array, self.lows, self.highs):
 
-			current_sample = current_sample[
-				numpy.all((vals > low) & (vals < high), axis=1)
-			]
-		return current_sample
+		# 	if len(current_sample) < 1:
+		# 		break
+		# 	vals = pdme.util.fast_v_calc.fast_vs_for_dipoleses(
+		# 		numpy.array([di]), current_sample
+		# 	)
+
+		# 	current_sample = current_sample[
+		# 		numpy.all((vals > low) & (vals < high), axis=1)
+		# 	]
+		# return current_sample
 
 	def execute(self) -> DirectMonteCarloResult:
 		step_count = 0
