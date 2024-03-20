@@ -125,7 +125,7 @@ def get_a_result_fast_filter_tarucha_spin_qubit_pair_phase_only(input) -> int:
 		r1s = dot_pair_inputs[:, 0, 0:3]
 		r2s = dot_pair_inputs[:, 1, 0:3]
 		f1s = dot_pair_inputs[:, 0, 3]
-		# Don't actually need this
+		# don't actually need, because we're assuming they're the same frequencies across the pair
 		# f2s = dot_pair_inputs[:, 1, 3]
 
 		diffses1 = r1s[:, None] - ss[:, None, :]

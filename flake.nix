@@ -1,63 +1,46 @@
 {
   description = "Application packaged using poetry2nix";
 
-  inputs.flake-utils.url = "github:numtide/flake-utils?rev=0f8662f1319ad6abf89b3380dd2722369fc51ade";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs?rev=37b6b161e536fddca54424cf80662bce735bdd1e";
-  inputs.poetry2nix.url = "github:nix-community/poetry2nix?rev=7b71679fa7df00e1678fc3f1d1d4f5f372341b63";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
+  inputs.poetry2nixSrc = {
+    url = "github:nix-community/poetry2nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-  outputs = { self, nixpkgs, flake-utils, poetry2nix }:
-    {
-      # Nixpkgs overlay providing the application
-      overlay = nixpkgs.lib.composeManyExtensions [
-        poetry2nix.overlay
-        (final: prev: {
-          # The application
-          deepdog = prev.poetry2nix.mkPoetryApplication {
-            overrides = final.poetry2nix.overrides.withDefaults (self: super: {
-              # …
-              # workaround https://github.com/nix-community/poetry2nix/issues/568
-              pdme = super.pdme.overridePythonAttrs (old: {
-                buildInputs = old.buildInputs or [ ] ++ [ final.python39.pkgs.poetry-core ];
-              });
-            });
-            projectDir = ./.;
-          };
-          deepdogEnv = prev.poetry2nix.mkPoetryEnv {
-            overrides = final.poetry2nix.overrides.withDefaults (self: super: {
-              # …
-              # workaround https://github.com/nix-community/poetry2nix/issues/568
-              pdme = super.pdme.overridePythonAttrs (old: {
-                buildInputs = old.buildInputs or [ ] ++ [ final.python39.pkgs.poetry-core ];
-              });
-            });
-            projectDir = ./.;
-          };
-        })
-      ];
-    } // (flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, flake-utils, poetry2nixSrc }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ self.overlay ];
-        };
-      in
-      {
-        apps = {
-          deepdog = pkgs.deepdog;
-        };
-
-        defaultApp = pkgs.deepdog;
-        devShell = pkgs.mkShell {
-          buildInputs = [
-            pkgs.poetry
-            pkgs.deepdogEnv
-            pkgs.deepdog
-          ];
-          shellHook = ''
-            export DO_NIX_CUSTOM=1
-          '';
-          packages = [ pkgs.nodejs-16_x ];
-        };
-
-      }));
+        pkgs = nixpkgs.legacyPackages.${system};
+	poetry2nix = poetry2nixSrc.lib.mkPoetry2Nix { inherit pkgs; };
+      in {
+        packages = {
+	  deepdogApp = poetry2nix.mkPoetryApplication {
+            projectDir = self;
+	    python = pkgs.python39;
+	    preferWheels = true;
+	  };
+	  deepdogEnv = poetry2nix.mkPoetryEnv {
+	    projectDir = self;
+	    python = pkgs.python39;
+	    preferWheels = true;
+	    overrides = poetry2nix.overrides.withDefaults (self: super: {
+	    });
+	  };
+	  default = self.packages.${system}.deepdogEnv;
+	};
+	devShells.default = pkgs.mkShell {
+	  inputsFrom = [ self.packages.${system}.deepdogEnv ];
+	  buildInputs = [
+	    pkgs.poetry
+	    self.packages.${system}.deepdogEnv
+	    self.packages.${system}.deepdogApp
+	    pkgs.just
+	  ];
+	  shellHook = ''
+	    export DO_NIX_CUSTOM=1
+	  '';
+	};
+      }
+    );
 }
