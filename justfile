@@ -43,7 +43,8 @@ fmt:
 	else
 		poetry run black .
 	fi
-	find . -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
+	find deepdog -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
+	find tests -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
 
 # release the app, checking that our working tree is clean and ready for release
 release:
