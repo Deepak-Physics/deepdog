@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.9](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.8...0.7.9) (2024-04-21)
+
+
+### Features
+
+* adds ability to write custom dmc filters ([ea080ca](https://gitea.deepak.science:2222/physics/deepdog/commit/ea080ca1c7068042ce1e0a222d317f785a6b05f4))
+* adds tarucha phase calculation, using spin qubit precession rate noise ([3ae0783](https://gitea.deepak.science:2222/physics/deepdog/commit/3ae0783d00cbe6a76439c1d671f2cff621d8d0a8))
+
 ### [0.7.8](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.7...0.7.8) (2024-02-29)
 
 
