@@ -15,4 +15,5 @@ The DiPole DiaGnostic tool.
 
 Commit using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), and when commits are on master, release with `doo release`.
 
-
+### local scripts
+`local_scripts` folder allows for scripts to be run using this code

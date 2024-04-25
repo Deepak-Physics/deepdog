@@ -143,3 +143,5 @@ dmypy.json
 cython_debug/
 
 *.csv
+
+local_scripts/
