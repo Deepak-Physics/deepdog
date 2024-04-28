@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.10](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.9...0.7.10) (2024-04-28)
+
+
+### Features
+
+* adds cli probs ([4b2e573](https://gitea.deepak.science:2222/physics/deepdog/commit/4b2e57371546731137b011461849bb849d4d4e0f))
+* better management of cli wrapper ([b0ad4be](https://gitea.deepak.science:2222/physics/deepdog/commit/b0ad4bead0d4762eb7f848f6e557f6d9b61200b9))
+
 ### [0.7.9](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.8...0.7.9) (2024-04-21)
 
 
