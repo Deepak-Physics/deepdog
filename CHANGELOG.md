@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.10...0.8.0) (2024-04-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* fixes the spin qubit frequency phase shift calculation which had an index problem
+
+### Bug Fixes
+
+* fixes the spin qubit frequency phase shift calculation which had an index problem ([f9646e3](https://gitea.deepak.science:2222/physics/deepdog/commit/f9646e33868e1a0da8ab663230c0c692ac25bb74))
+
 ### [0.7.10](https://gitea.deepak.science:2222/physics/deepdog/compare/0.7.9...0.7.10) (2024-04-28)
 
 
