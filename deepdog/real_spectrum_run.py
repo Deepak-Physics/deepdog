@@ -144,7 +144,7 @@ def get_a_result_fast_filter_tarucha_spin_qubit_pair_phase_only(input) -> int:
 					* numpy.transpose(diffses1)
 				)[:, :, :, 0]
 			)
-			- ps[:, :, 0, numpy.newaxis]
+			- ps[:, numpy.newaxis, :, 0]
 		) / (norms1**3)
 		alphses2 = (
 			(
@@ -156,7 +156,7 @@ def get_a_result_fast_filter_tarucha_spin_qubit_pair_phase_only(input) -> int:
 					* numpy.transpose(diffses2)
 				)[:, :, :, 0]
 			)
-			- ps[:, :, 0, numpy.newaxis]
+			- ps[:, numpy.newaxis, :, 0]
 		) / (norms2**3)
 
 		bses = (1 / numpy.pi) * (
