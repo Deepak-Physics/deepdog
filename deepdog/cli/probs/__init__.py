@@ -1,5 +1,5 @@
-from deepdog.cli.probs.main import main
+from deepdog.cli.probs.main import wrapped_main
 
 __all__ = [
-	"main",
+	"wrapped_main",
 ]

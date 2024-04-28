@@ -27,8 +27,8 @@ def parse_args() -> argparse.Namespace:
 	)
 	parser.add_argument(
 		"--indexify-json",
-		help="A json file with the indexify config for parsing job indexes",
-		default="indexes.json",
+		help="A json file with the indexify config for parsing job indexes. Will skip if not present",
+		default="",
 	)
 	parser.add_argument(
 		"--seed-index",

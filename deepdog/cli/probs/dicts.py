@@ -2,6 +2,7 @@ import typing
 from deepdog.results import BayesrunOutput
 import logging
 import csv
+import tqdm
 
 _logger = logging.getLogger(__name__)
 
@@ -21,7 +22,8 @@ def build_model_dict(
 		typing.Tuple, typing.Dict[typing.Tuple, typing.Dict["str", typing.Any]]
 	] = {}
 
-	for out in bayes_outputs:
+	_logger.info("building model dict")
+	for out in tqdm.tqdm(bayes_outputs, desc="reading outputs", leave=False):
 		for model_result in out.results:
 			model_key = tuple(v for v in model_result.parsed_model_keys.values())
 			if model_key not in model_dict:
@@ -88,10 +90,21 @@ def write_uncoalesced_dict(
 def coalesced_dict(
 	uncoalesced_model_dict: typing.Dict[
 		typing.Tuple, typing.Dict[typing.Tuple, typing.Dict["str", typing.Any]]
-	]
+	],
+	minimum_count: float = 0.1,
 ):
+	"""
+	pass in uncoalesced dict
+	the minimum_count field is what we use to make sure our probs are never zero
+	"""
 	coalesced_dict = {}
+
+	# we are already iterating so for no reason because performance really doesn't matter let's count the keys ourselves
+	num_keys = 0
+
+	# first pass coalesce
 	for model_key, model_dict in uncoalesced_model_dict.items():
+		num_keys += 1
 		for calculation in model_dict.values():
 			if model_key not in coalesced_dict:
 				coalesced_dict[model_key] = {
@@ -104,6 +117,33 @@ def coalesced_dict(
 			sub_dict["calculations_coalesced"] += 1
 			sub_dict["count"] += calculation["count"]
 			sub_dict["success"] += calculation["success"]
+
+	# second pass do probability calculation
+
+	prior = 1 / num_keys
+	_logger.info(f"Got {num_keys} model keys, so our prior will be {prior}")
+
+	total_weight = 0
+	for coalesced_model_dict in coalesced_dict.values():
+		model_weight = (
+			max(minimum_count, coalesced_model_dict["success"])
+			/ coalesced_model_dict["count"]
+		) * prior
+		total_weight += model_weight
+
+	total_prob = 0
+	for coalesced_model_dict in coalesced_dict.values():
+		model_weight = (
+			max(minimum_count, coalesced_model_dict["success"])
+			/ coalesced_model_dict["count"]
+		)
+		prob = model_weight * prior / total_weight
+		coalesced_model_dict["prob"] = prob
+		total_prob += prob
+
+	_logger.debug(
+		f"Got a total probability of {total_prob}, which should be close to 1 up to float/rounding error"
+	)
 	return coalesced_dict
 
 
@@ -120,7 +160,7 @@ def write_coalesced_dict(
 	_logger.info(f"Detected model field names {model_field_names}")
 
 	collected_fieldnames = list(model_field_names)
-	collected_fieldnames.extend(["calculations_coalesced", "success", "count"])
+	collected_fieldnames.extend(["calculations_coalesced", "success", "count", "prob"])
 	with open(coalesced_output_filename, "w", newline="") as coalesced_output_file:
 		writer = csv.DictWriter(coalesced_output_file, fieldnames=collected_fieldnames)
 		writer.writeheader()
@@ -132,6 +172,7 @@ def write_coalesced_dict(
 					"calculations_coalesced": model_dict["calculations_coalesced"],
 					"success": model_dict["success"],
 					"count": model_dict["count"],
+					"prob": model_dict["prob"],
 				}
 			)
 			writer.writerow(row)
