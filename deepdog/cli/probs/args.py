@@ -31,18 +31,6 @@ def parse_args() -> argparse.Namespace:
 		default="",
 	)
 	parser.add_argument(
-		"--seed-index",
-		type=int,
-		help='take an integer to append as a "seed" key with range at end of indexify dict. Skip if <= 0',
-		default=0,
-	)
-	parser.add_argument(
-		"--seed-fieldname",
-		type=str,
-		help='if --seed-index is set, the fieldname to append to the indexifier. "seed" by default',
-		default="seed",
-	)
-	parser.add_argument(
 		"--coalesced-keys",
 		type=str,
 		help="A comma separated list of strings over which to coalesce data. By default coalesce over all fields within model names, ignore file level names",

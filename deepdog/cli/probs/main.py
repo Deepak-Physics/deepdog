@@ -51,9 +51,13 @@ def main(args: argparse.Namespace):
 		indexifier = None
 		if args.indexify_json:
 			with open(args.indexify_json, "r") as indexify_json_file:
-				indexify_data = json.load(indexify_json_file)
-				if args.seed_index > 0:
-					indexify_data[args.seed_fieldname] = list(range(args.seed_index))
+				indexify_spec = json.load(indexify_json_file)
+				indexify_data = indexify_spec["indexes"]
+				if "seed_spec" in indexify_spec:
+					seed_spec = indexify_spec["seed_spec"]
+					indexify_data[seed_spec["field_name"]] = list(
+						range(seed_spec["num_seeds"])
+					)
 				# _logger.debug(f"Indexifier data looks like {indexify_data}")
 				indexifier = deepdog.indexify.Indexifier(indexify_data)
 
