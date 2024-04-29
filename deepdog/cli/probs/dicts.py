@@ -61,7 +61,7 @@ def write_uncoalesced_dict(
 	if not (set(model_field_names).isdisjoint(calculation_field_names)):
 		_logger.info(f"Detected model field names {model_field_names}")
 		_logger.info(f"Detected calculation field names {calculation_field_names}")
-		raise ValueError(
+		_logger.warning(
 			f"model field names {model_field_names} and calculation {calculation_field_names} have an overlap, which is possibly a problem"
 		)
 	collected_fieldnames = list(model_field_names)
