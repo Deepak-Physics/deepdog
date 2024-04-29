@@ -16,6 +16,7 @@ MODEL_REGEXES = [
 
 FILE_SLUG_REGEXES = [
 	r"mock_tarucha-(?P<job_index>\d+)",
+	r"(?:(?P<mock>mock)_)?tarucha(?:_(?P<tarucha_run_id>\d+))?-(?P<job_index>\d+)",
 ]
 
 
