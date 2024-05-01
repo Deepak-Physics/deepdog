@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.8.1...1.0.0) (2024-05-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* allows new seed spec instead of cli arg, removes old cli arg
+
+### Features
+
+* adds additional file slug parsing ([2105754](https://gitea.deepak.science:2222/physics/deepdog/commit/2105754911c89bde9dcbea9866462225604a3524))
+* Adds more powerful direct mc runs to sub for old real spectrum run ([f2b1a1d](https://gitea.deepak.science:2222/physics/deepdog/commit/f2b1a1dd3b3436e37d84f7843b9b2a202be4b51c))
+* allows new seed spec instead of cli arg, removes old cli arg ([7108dd0](https://gitea.deepak.science:2222/physics/deepdog/commit/7108dd0111c7dfd6ec204df1d0058530cd3dcab9))
+
+
+### Bug Fixes
+
+* no longer throws error for overlapping keys, the warning should hopefully be enough? ([f3ba4cb](https://gitea.deepak.science:2222/physics/deepdog/commit/f3ba4cbfd36a9f08cdc4d8774a7f745f8c98bac3))
+
 ### [0.8.1](https://gitea.deepak.science:2222/physics/deepdog/compare/0.8.0...0.8.1) (2024-04-28)
 
 ### [0.8.1](https://gitea.deepak.science:2222/physics/deepdog/compare/0.8.0...0.8.1) (2024-04-28)
