@@ -1,13 +1,16 @@
+import csv
 import pdme.model
 import pdme.measurement
 import pdme.measurement.input_types
 import pdme.subspace_simulation
-from typing import Tuple, Dict, NewType, Any
+import datetime
+from typing import Tuple, Dict, NewType, Any, Sequence
 from dataclasses import dataclass
 import logging
 import numpy
 import numpy.random
 import pdme.util.fast_v_calc
+import multiprocessing
 
 _logger = logging.getLogger(__name__)
 
@@ -17,6 +20,7 @@ class DirectMonteCarloResult:
 	successes: int
 	monte_carlo_count: int
 	likelihood: float
+	model_name: str
 
 
 @dataclass
@@ -28,6 +32,10 @@ class DirectMonteCarloConfig:
 	monte_carlo_seed: int = 1234
 	write_successes_to_file: bool = False
 	tag: str = ""
+	cap_core_count: int = 0  # 0 means cap at num cores - 1
+	chunk_size: int = 50
+	write_bayesrun_file = True
+	# chunk size of some kind
 
 
 # Aliasing dict as a generic data container
@@ -51,8 +59,8 @@ class DirectMonteCarloRun:
 
 	Parameters
 	----------
-	model_name_pair : Sequence[Tuple(str, pdme.model.DipoleModel)]
-	The model to evaluate, with name.
+	model_name_pairs : Sequence[Tuple(str, pdme.model.DipoleModel)]
+	The models to evaluate, with names
 
 	measurements: Sequence[pdme.measurement.DotRangeMeasurement]
 	The measurements as dot ranges to use as the bounds for the Monte Carlo calculation.
@@ -78,11 +86,11 @@ class DirectMonteCarloRun:
 
 	def __init__(
 		self,
-		model_name_pair: Tuple[str, pdme.model.DipoleModel],
+		model_name_pairs: Sequence[Tuple[str, pdme.model.DipoleModel]],
 		filter: DirectMonteCarloFilter,
 		config: DirectMonteCarloConfig,
 	):
-		self.model_name, self.model = model_name_pair
+		self.model_name_pairs = model_name_pairs
 
 		# self.measurements = measurements
 		# self.dot_inputs = [(measure.r, measure.f) for measure in self.measurements]
@@ -100,10 +108,16 @@ class DirectMonteCarloRun:
 		# 	self.measurements
 		# )
 
-	def _single_run(self, seed) -> numpy.ndarray:
+	def _single_run(
+		self, model_name_pair: Tuple[str, pdme.model.DipoleModel], seed
+	) -> numpy.ndarray:
 		rng = numpy.random.default_rng(seed)
 
-		sample_dipoles = self.model.get_monte_carlo_dipole_inputs(
+		_, model = model_name_pair
+		# don't log here it's madness
+		# _logger.info(f"Executing for model {model_name}")
+
+		sample_dipoles = model.get_monte_carlo_dipole_inputs(
 			self.config.monte_carlo_count_per_cycle, -1, rng
 		)
 
@@ -123,52 +137,183 @@ class DirectMonteCarloRun:
 		# 	]
 		# return current_sample
 
-	def execute(self) -> DirectMonteCarloResult:
-		step_count = 0
-		total_success = 0
-		total_count = 0
+	def _wrapped_single_run(self, args: Tuple):
+		"""
+		single run wrapped up for multiprocessing call.
+
+		takes in a tuple of arguments corresponding to
+		(model_name_pair, seed)
+		"""
+		# here's where we do our work
+
+		model_name_pair, seed = args
+		cycle_success_configs = self._single_run(model_name_pair, seed)
+		cycle_success_count = len(cycle_success_configs)
+
+		return cycle_success_count
+
+	def execute_no_multiprocessing(self) -> Sequence[DirectMonteCarloResult]:
 
 		count_per_step = (
 			self.config.monte_carlo_count_per_cycle * self.config.monte_carlo_cycles
 		)
 		seed_sequence = numpy.random.SeedSequence(self.config.monte_carlo_seed)
-		while (step_count < self.config.max_monte_carlo_cycles_steps) and (
-			total_success < self.config.target_success
-		):
-			_logger.debug(f"Executing step {step_count}")
-			for cycle_i, seed in enumerate(
-				seed_sequence.spawn(self.config.monte_carlo_cycles)
-			):
-				cycle_success_configs = self._single_run(seed)
-				cycle_success_count = len(cycle_success_configs)
-				if cycle_success_count > 0:
-					_logger.debug(
-						f"For cycle {cycle_i} received {cycle_success_count} successes"
-					)
-					_logger.debug(cycle_success_configs)
-					if self.config.write_successes_to_file:
-						sorted_by_freq = numpy.array(
-							[
-								pdme.subspace_simulation.sort_array_of_dipoles_by_frequency(
-									dipole_config
-								)
-								for dipole_config in cycle_success_configs
-							]
-						)
-						dipole_count = numpy.array(cycle_success_configs).shape[1]
-						for n in range(dipole_count):
-							numpy.savetxt(
-								f"{self.config.tag}_{step_count}_{cycle_i}_dipole_{n}.csv",
-								sorted_by_freq[:, n],
-								delimiter=",",
-							)
-				total_success += cycle_success_count
-			_logger.debug(f"At end of step {step_count} have {total_success} successes")
-			step_count += 1
-			total_count += count_per_step
 
-		return DirectMonteCarloResult(
-			successes=total_success,
-			monte_carlo_count=total_count,
-			likelihood=total_success / total_count,
+		# core count etc. logic here
+
+		results = []
+		for model_name_pair in self.model_name_pairs:
+			step_count = 0
+			total_success = 0
+			total_count = 0
+
+			_logger.info(f"Working on model {model_name_pair[0]}")
+			# This is probably where multiprocessing logic should go
+			while (step_count < self.config.max_monte_carlo_cycles_steps) and (
+				total_success < self.config.target_success
+			):
+				_logger.debug(f"Executing step {step_count}")
+				for cycle_i, seed in enumerate(
+					seed_sequence.spawn(self.config.monte_carlo_cycles)
+				):
+					# here's where we do our work
+					cycle_success_configs = self._single_run(model_name_pair, seed)
+					cycle_success_count = len(cycle_success_configs)
+					if cycle_success_count > 0:
+						_logger.debug(
+							f"For cycle {cycle_i} received {cycle_success_count} successes"
+						)
+						# _logger.debug(cycle_success_configs)
+						if self.config.write_successes_to_file:
+							sorted_by_freq = numpy.array(
+								[
+									pdme.subspace_simulation.sort_array_of_dipoles_by_frequency(
+										dipole_config
+									)
+									for dipole_config in cycle_success_configs
+								]
+							)
+							dipole_count = numpy.array(cycle_success_configs).shape[1]
+							for n in range(dipole_count):
+								numpy.savetxt(
+									f"{self.config.tag}_{step_count}_{cycle_i}_dipole_{n}.csv",
+									sorted_by_freq[:, n],
+									delimiter=",",
+								)
+					total_success += cycle_success_count
+				_logger.debug(
+					f"At end of step {step_count} have {total_success} successes"
+				)
+				step_count += 1
+				total_count += count_per_step
+
+			results.append(
+				DirectMonteCarloResult(
+					successes=total_success,
+					monte_carlo_count=total_count,
+					likelihood=total_success / total_count,
+					model_name=model_name_pair[0],
+				)
+			)
+		return results
+
+	def execute(self) -> Sequence[DirectMonteCarloResult]:
+
+		# set starting execution timestamp
+		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+		count_per_step = (
+			self.config.monte_carlo_count_per_cycle * self.config.monte_carlo_cycles
 		)
+		seed_sequence = numpy.random.SeedSequence(self.config.monte_carlo_seed)
+
+		# core count etc. logic here
+		core_count = multiprocessing.cpu_count() - 1 or 1
+		if (self.config.cap_core_count >= 1) and (
+			self.config.cap_core_count < core_count
+		):
+			core_count = self.config.cap_core_count
+		_logger.info(f"Using {core_count} cores")
+
+		results = []
+		with multiprocessing.Pool(core_count) as pool:
+
+			for model_name_pair in self.model_name_pairs:
+				_logger.info(f"Working on model {model_name_pair[0]}")
+				# This is probably where multiprocessing logic should go
+
+				step_count = 0
+				total_success = 0
+				total_count = 0
+
+				while (step_count < self.config.max_monte_carlo_cycles_steps) and (
+					total_success < self.config.target_success
+				):
+
+					step_count += 1
+
+					_logger.debug(f"Executing step {step_count}")
+
+					seeds = seed_sequence.spawn(self.config.monte_carlo_cycles)
+
+					pool_results = sum(
+						pool.imap_unordered(
+							self._wrapped_single_run,
+							[(model_name_pair, seed) for seed in seeds],
+							self.config.chunk_size,
+						)
+					)
+					_logger.debug(f"Pool results: {pool_results}")
+
+					total_success += pool_results
+					total_count += count_per_step
+					_logger.debug(
+						f"At end of step {step_count} have {total_success} successes"
+					)
+
+				results.append(
+					DirectMonteCarloResult(
+						successes=total_success,
+						monte_carlo_count=total_count,
+						likelihood=total_success / total_count,
+						model_name=model_name_pair[0],
+					)
+				)
+
+		if self.config.write_bayesrun_file:
+
+			filename = (
+				f"{timestamp}-{self.config.tag}.realdata.fast_filter.bayesrun.csv"
+			)
+			_logger.info(f"Going to write to file [{filename}]")
+			# row: Dict[str, Union[int, float, str]] = {}
+			row = {}
+
+			num_models = len(self.model_name_pairs)
+			success_weight = sum(
+				[
+					(res.successes / res.monte_carlo_count) / num_models
+					for res in results
+				]
+			)
+
+			for res in results:
+				row.update(
+					{
+						f"{res.model_name}_success": res.successes,
+						f"{res.model_name}_count": res.monte_carlo_count,
+						f"{res.model_name}_prob": (
+							res.successes / res.monte_carlo_count
+						)
+						/ (num_models * success_weight),
+					}
+				)
+			_logger.info(f"Writing row {row}")
+			fieldnames = list(row.keys())
+
+			with open(filename, "w", newline="") as outfile:
+				writer = csv.DictWriter(outfile, fieldnames=fieldnames, dialect="unix")
+				writer.writeheader()
+				writer.writerow(row)
+
+		return results
