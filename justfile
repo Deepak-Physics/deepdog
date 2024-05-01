@@ -46,9 +46,15 @@ fmt:
 	find deepdog -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
 	find tests -type f -name "*.py" -exec sed -i -e 's/    /\t/g' {} \;
 
-# release the app, checking that our working tree is clean and ready for release
-release:
-	./scripts/release.sh
+# release the app, checking that our working tree is clean and ready for release, optionally takes target version
+release version="":
+	#!/usr/bin/env bash
+	set -euxo pipefail
+	if [[ -n "{{version}}" ]]; then
+		./scripts/release.sh {{version}}
+	else
+		./scripts/release.sh
+	fi
 
 htmlcov:
 	poetry run pytest --cov-report=html
