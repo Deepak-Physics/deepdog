@@ -36,6 +36,7 @@
 	    self.packages.${system}.deepdogEnv
 	    self.packages.${system}.deepdogApp
 	    pkgs.just
+	    pkgs.nodejs
 	  ];
 	  shellHook = ''
 	    export DO_NIX_CUSTOM=1
