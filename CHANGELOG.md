@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://gitea.deepak.science:2222/physics/deepdog/compare/1.0.0...1.0.1) (2024-05-02)
+
+
+### Bug Fixes
+
+* fixes issue of zero division error with no successes for anything ([e25db1e](https://gitea.deepak.science:2222/physics/deepdog/commit/e25db1e0f677e8d9a657fa1631305cc8f05ff9ff))
+
 ## [1.0.0](https://gitea.deepak.science:2222/physics/deepdog/compare/0.8.1...1.0.0) (2024-05-01)
 
 
