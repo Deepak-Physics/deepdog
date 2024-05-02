@@ -37,6 +37,7 @@ class DirectMonteCarloConfig:
 	cap_core_count: int = 0  # 0 means cap at num cores - 1
 	chunk_size: int = 50
 	write_bayesrun_file = True
+	bayesrun_file_timestamp = True
 	# chunk size of some kind
 
 
@@ -284,9 +285,14 @@ class DirectMonteCarloRun:
 
 		if self.config.write_bayesrun_file:
 
+			if self.config.bayesrun_file_timestamp:
+				timestamp_str = f"{timestamp}-"
+			else:
+				timestamp_str = ""
 			filename = (
-				f"{timestamp}-{self.config.tag}.realdata.fast_filter.bayesrun.csv"
+				f"{timestamp_str}{self.config.tag}.realdata.fast_filter.bayesrun.csv"
 			)
+
 			_logger.info(f"Going to write to file [{filename}]")
 			# row: Dict[str, Union[int, float, str]] = {}
 			row = {}
