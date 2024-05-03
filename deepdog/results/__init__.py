@@ -11,7 +11,8 @@ _logger = logging.getLogger(__name__)
 FILENAME_REGEX = r"(?P<timestamp>\d{8}-\d{6})-(?P<filename_slug>.*)\.realdata\.fast_filter\.bayesrun\.csv"
 
 MODEL_REGEXES = [
-	r"geom_(?P<xmin>-?\d+)_(?P<xmax>-?\d+)_(?P<ymin>-?\d+)_(?P<ymax>-?\d+)_(?P<zmin>-?\d+)_(?P<zmax>-?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)"
+	r"geom_(?P<xmin>-?\d+)_(?P<xmax>-?\d+)_(?P<ymin>-?\d+)_(?P<ymax>-?\d+)_(?P<zmin>-?\d+)_(?P<zmax>-?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)",
+	r"geom_(?P<xmin>-?\d+)_(?P<xmax>-?\d+)_(?P<ymin>-?\d+)_(?P<ymax>-?\d+)_(?P<zmin>-?\d+)_(?P<zmax>-?\d+)-magnitude_(?P<log_magnitude>\d*\.?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)",
 ]
 
 FILE_SLUG_REGEXES = [
@@ -27,7 +28,6 @@ class BayesrunOutputFilename:
 	path: pathlib.Path
 
 
-@dataclasses.dataclass
 class BayesrunColumnParsed:
 	"""
 	class for parsing a bayesrun while pulling certain special fields out
@@ -38,9 +38,20 @@ class BayesrunColumnParsed:
 		self.model_field_dict = {
 			k: v for k, v in groupdict.items() if k != "field_name"
 		}
+		self._groupdict_str = repr(groupdict)
 
 	def __str__(self):
 		return f"BayesrunColumnParsed[{self.column_field}: {self.model_field_dict}]"
+
+	def __repr__(self):
+		return f"BayesrunColumnParsed({self._groupdict_str})"
+
+	def __eq__(self, other):
+		if isinstance(other, BayesrunColumnParsed):
+			return (self.column_field == other.column_field) and (
+				self.model_field_dict == other.model_field_dict
+			)
+		return NotImplemented
 
 
 @dataclasses.dataclass
