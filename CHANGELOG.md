@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.0.1...1.1.0) (2024-05-03)
+
+
+### Features
+
+* allows disabling timestamps in directmc bayesrun files ([fb018ab](https://gitea.deepak.science:2222/physics/deepdog/commit/fb018abeae2adf4438a030140a6c905f11bb6bc1))
+* removes legacy bayes run, technically breaking but just don't use them ([5361dad](https://gitea.deepak.science:2222/physics/deepdog/commit/5361dada8be4950b5157862f6a92254b543889c3))
+
 ### [1.0.1](https://gitea.deepak.science:2222/physics/deepdog/compare/1.0.0...1.0.1) (2024-05-02)
 
 
