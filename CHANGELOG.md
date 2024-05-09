@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.1.0...1.2.0) (2024-05-09)
+
+
+### Features
+
+* adds additional matching regexes ([dc1d2d4](https://gitea.deepak.science:2222/physics/deepdog/commit/dc1d2d45a3e631c5efccce80f8a24fa87c6089e0))
+* adds magnitude enabled parsing option ([f0e2fa3](https://gitea.deepak.science:2222/physics/deepdog/commit/f0e2fa3da9f5a5136908d691137a904fda4e3a9a))
+
 ## [1.1.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.0.1...1.1.0) (2024-05-03)
 
 
