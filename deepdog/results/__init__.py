@@ -8,19 +8,29 @@ import csv
 
 _logger = logging.getLogger(__name__)
 
-FILENAME_REGEX = r"(?P<timestamp>\d{8}-\d{6})-(?P<filename_slug>.*)\.realdata\.fast_filter\.bayesrun\.csv"
+FILENAME_REGEX = re.compile(
+	r"(?P<timestamp>\d{8}-\d{6})-(?P<filename_slug>.*)\.realdata\.fast_filter\.bayesrun\.csv"
+)
 
 MODEL_REGEXES = [
-	r"geom_(?P<xmin>-?\d+)_(?P<xmax>-?\d+)_(?P<ymin>-?\d+)_(?P<ymax>-?\d+)_(?P<zmin>-?\d+)_(?P<zmax>-?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)",
-	r"geom_(?P<xmin>-?\d+)_(?P<xmax>-?\d+)_(?P<ymin>-?\d+)_(?P<ymax>-?\d+)_(?P<zmin>-?\d+)_(?P<zmax>-?\d+)-magnitude_(?P<log_magnitude>\d*\.?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)",
-	r"geom_(?P<xmin>-?\d*\.?\d+)_(?P<xmax>-?\d*\.?\d+)_(?P<ymin>-?\d*\.?\d+)_(?P<ymax>-?\d*\.?\d+)_(?P<zmin>-?\d*\.?\d+)_(?P<zmax>-?\d*\.?\d+)-magnitude_(?P<log_magnitude>\d*\.?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)"
+	re.compile(pattern)
+	for pattern in [
+		r"geom_(?P<xmin>-?\d+)_(?P<xmax>-?\d+)_(?P<ymin>-?\d+)_(?P<ymax>-?\d+)_(?P<zmin>-?\d+)_(?P<zmax>-?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)",
+		r"geom_(?P<xmin>-?\d+)_(?P<xmax>-?\d+)_(?P<ymin>-?\d+)_(?P<ymax>-?\d+)_(?P<zmin>-?\d+)_(?P<zmax>-?\d+)-magnitude_(?P<log_magnitude>\d*\.?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)",
+		r"geom_(?P<xmin>-?\d*\.?\d+)_(?P<xmax>-?\d*\.?\d+)_(?P<ymin>-?\d*\.?\d+)_(?P<ymax>-?\d*\.?\d+)_(?P<zmin>-?\d*\.?\d+)_(?P<zmax>-?\d*\.?\d+)-magnitude_(?P<log_magnitude>\d*\.?\d+)-orientation_(?P<orientation>free|fixedxy|fixedz)-dipole_count_(?P<avg_filled>\d+)_(?P<field_name>\w*)",
+	]
 ]
 
 FILE_SLUG_REGEXES = [
-	r"mock_tarucha-(?P<job_index>\d+)",
-	r"(?:(?P<mock>mock)_)?tarucha(?:_(?P<tarucha_run_id>\d+))?-(?P<job_index>\d+)",
-	r"(?P<tag>\w+)-(?P<job_index>\d+)",
+	re.compile(pattern)
+	for pattern in [
+		r"(?P<tag>\w+)-(?P<job_index>\d+)",
+		r"mock_tarucha-(?P<job_index>\d+)",
+		r"(?:(?P<mock>mock)_)?tarucha(?:_(?P<tarucha_run_id>\d+))?-(?P<job_index>\d+)",
+	]
 ]
+
+SIMPLE_TAG_REGEX = re.compile(r"\w+-\d+")
 
 
 @dataclasses.dataclass
@@ -86,7 +96,7 @@ def _parse_bayesrun_column(
 	Returns the groupdict for the first match, or None if no match found.
 	"""
 	for pattern in MODEL_REGEXES:
-		match = re.match(pattern, column)
+		match = pattern.match(column)
 		if match:
 			return BayesrunColumnParsed(match.groupdict())
 	else:
@@ -125,7 +135,7 @@ def _parse_bayesrun_row(
 
 def _parse_output_filename(file: pathlib.Path) -> BayesrunOutputFilename:
 	filename = file.name
-	match = re.match(FILENAME_REGEX, filename)
+	match = FILENAME_REGEX.match(filename)
 	if not match:
 		raise ValueError(f"{filename} was not a valid bayesrun output")
 	groups = match.groupdict()
@@ -136,7 +146,7 @@ def _parse_output_filename(file: pathlib.Path) -> BayesrunOutputFilename:
 
 def _parse_file_slug(slug: str) -> typing.Optional[typing.Dict[str, str]]:
 	for pattern in FILE_SLUG_REGEXES:
-		match = re.match(pattern, slug)
+		match = pattern.match(slug)
 		if match:
 			return match.groupdict()
 	else:
