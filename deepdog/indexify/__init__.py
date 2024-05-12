@@ -31,10 +31,10 @@ class Indexifier:
 
 	def __init__(self, list_dict: typing.Dict[str, typing.Sequence]):
 		self.dict = list_dict
+		self.product_dict = _dict_product(self.dict)
 
 	def indexify(self, n: int) -> typing.Dict[str, typing.Any]:
-		product_dict = _dict_product(self.dict)
-		return product_dict[n]
+		return self.product_dict[n]
 
 	def _indexify_indices(self, n: int) -> typing.Sequence[int]:
 		"""
