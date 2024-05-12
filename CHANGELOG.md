@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://gitea.deepak.science:2222/physics/deepdog/compare/1.2.0...1.2.1) (2024-05-12)
+
 ## [1.2.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.1.0...1.2.0) (2024-05-09)
 
 
