@@ -94,9 +94,8 @@ class SubsetSimulation:
 		_logger.info(f"\tn_c: {self.n_c}")
 		_logger.info(f"\tn_s: {self.n_s}")
 		_logger.info(f"\tm: {self.m_max}")
-		_logger.info(f"\tseeds:")
-		_logger.info(f"\t\t{mcmc_seed=}")
-		_logger.info(f"\t\t{level_0_seed=}")
+		_logger.info(f"\t{mcmc_seed=}")
+		_logger.info(f"\t{level_0_seed=}")
 		_logger.info("let's do level 0...")
 
 		self.target_cost = target_cost
@@ -271,22 +270,6 @@ class SubsetSimulation:
 
 					samples_generated += self.n_s
 					samples_rejected += rejected_count
-
-				# for seed_index, (c, s) in enumerate(next_seeds):
-				# 	# chain = mcmc(s, threshold_cost, n_s, model, dot_inputs_array, actual_measurement_array, mcmc_rng, curr_cost=c, stdevs=stdevs)
-				# 	# until new version gotta do
-				# 	_logger.debug(
-				# 		f"\t{seed_index}: getting another chain from the next seed"
-				# 	)
-				# 	rejected_count, chain = self.model.get_repeat_counting_mcmc_chain(
-				# 		s,
-				# 		self.cost_function_to_use,
-				# 		self.n_s,
-				# 		threshold_cost,
-				# 		stdevs,
-				# 		initial_cost=c,
-				# 		rng_arg=mcmc_rng,
-				# 	)
 
 				_logger.debug("finished mcmc")
 				_logger.debug(f"{samples_rejected=} out of {samples_generated=}")
