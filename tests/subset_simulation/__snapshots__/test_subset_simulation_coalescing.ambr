@@ -1,0 +1,10 @@
+# serializer version: 1
+# name: test_subset_simulation_multi_result_coalescing_easy_arithmetic
+  MultiSubsetSimulationResult(child_results=[SubsetSimulationResult(probs_list=(), over_target_cost=1, over_target_likelihood=1, under_target_cost=0.99, under_target_likelihood=0.8, lowest_likelihood=0.5, messages=[]), SubsetSimulationResult(probs_list=(), over_target_cost=1, over_target_likelihood=1, under_target_cost=0.99, under_target_likelihood=0.6, lowest_likelihood=0.01, messages=[])], model_name='test', estimated_likelihood=0.6928203230275509, arithmetic_mean_estimated_likelihood=0.7, num_children=2, num_finished_children=2, clean_estimate=True)
+# ---
+# name: test_subset_simulation_multi_result_coalescing_easy_geometric
+  MultiSubsetSimulationResult(child_results=[SubsetSimulationResult(probs_list=(), over_target_cost=1, over_target_likelihood=1, under_target_cost=0.99, under_target_likelihood=0.1, lowest_likelihood=0.5, messages=[]), SubsetSimulationResult(probs_list=(), over_target_cost=1, over_target_likelihood=1, under_target_cost=0.99, under_target_likelihood=0.001, lowest_likelihood=0.01, messages=[])], model_name='test', estimated_likelihood=0.010000000000000004, arithmetic_mean_estimated_likelihood=0.0505, num_children=2, num_finished_children=2, clean_estimate=True)
+# ---
+# name: test_subset_simulation_multi_result_coalescing_include_dirty
+  MultiSubsetSimulationResult(child_results=[SubsetSimulationResult(probs_list=(), over_target_cost=1, over_target_likelihood=1, under_target_cost=0.99, under_target_likelihood=0.8, lowest_likelihood=0.5, messages=[]), SubsetSimulationResult(probs_list=(), over_target_cost=1, over_target_likelihood=1, under_target_cost=0.99, under_target_likelihood=0.08, lowest_likelihood=0.01, messages=[]), SubsetSimulationResult(probs_list=(), over_target_cost=None, over_target_likelihood=None, under_target_cost=None, under_target_likelihood=None, lowest_likelihood=0.0001, messages=[])], model_name='test', estimated_likelihood=0.01856635533445112, arithmetic_mean_estimated_likelihood=0.29336666666666666, num_children=3, num_finished_children=2, clean_estimate=False)
+# ---
