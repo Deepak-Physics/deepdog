@@ -786,13 +786,13 @@ files = [
 
 [[package]]
 name = "pdme"
-version = "1.2.0"
+version = "1.5.0"
 description = "Python dipole model evaluator"
 optional = false
 python-versions = "<3.10,>=3.8.1"
 files = [
-    {file = "pdme-1.2.0-py3-none-any.whl", hash = "sha256:602710a053f22921b4adbc03d46d284149fe2367a65455cde56608708e01c84b"},
-    {file = "pdme-1.2.0.tar.gz", hash = "sha256:412806d7ae384c048515e0f2cba70252778bf153800829a1d3265a0596872263"},
+    {file = "pdme-1.5.0-py3-none-any.whl", hash = "sha256:1b4fa30ba98a336957b3029563552d73286a3a5f932809ac1330e65a1f61c363"},
+    {file = "pdme-1.5.0.tar.gz", hash = "sha256:cc0ac4ffab2994e08b4efde2991c6d9dccb2942c7e33c4be3b52e068366526d1"},
 ]
 
 [package.dependencies]
@@ -1275,4 +1275,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.10"
-content-hash = "918b6736766a9c1b6732a56e1ef2e7a53241f2e25babb884881e49c299801fc9"
+content-hash = "85114054176aa164964acea6fdc085581ee7fc2f94c1cd03ad77611b82e52c79"
