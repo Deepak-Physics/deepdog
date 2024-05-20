@@ -72,6 +72,7 @@ def main(args: argparse.Namespace):
 			for f in tqdm.tqdm(out_files, desc="reading files", leave=False)
 		]
 
+		# Refactor here to allow for arbitrary likelihood file sources
 		_logger.info("building uncoalesced dict")
 		uncoalesced_dict = deepdog.cli.probs.dicts.build_model_dict(parsed_output_files)
 
