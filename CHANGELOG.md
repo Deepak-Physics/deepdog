@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.2.1...1.3.0) (2024-05-20)
+
+
+### Features
+
+* add multi run to wrap multi model and repeat runs ([92b49fc](https://gitea.deepak.science:2222/physics/deepdog/commit/92b49fce7c86f14484deb1c4aaaa810a6f69c08a))
+* adds a filter that works with cost functions ([8845b28](https://gitea.deepak.science:2222/physics/deepdog/commit/8845b2875f2c91c91dd3988fabda26400c59b2d7))
+* improve initial cost calculation to allow multiprocessing, adds ability to specify a number of levels to do with direct mc instead of subset simulation ([09fad2e](https://gitea.deepak.science:2222/physics/deepdog/commit/09fad2e1024d9237a6a4f7931f51cb4c84b83bf8))
+
+
+### Bug Fixes
+
+* Adds ugly hack for stdevs for this uniform range to multiply by root3, proper fix would be in pdme ([b1c01b2](https://gitea.deepak.science:2222/physics/deepdog/commit/b1c01b25c8f2c3947be23f5b2c656c37437dab17))
+* fix seeding to avoid recreating seed combinations across multi runs ([24ac65b](https://gitea.deepak.science:2222/physics/deepdog/commit/24ac65bf9c74c454fec826ca9de640fe095f5a17))
+
 ### [1.2.1](https://gitea.deepak.science:2222/physics/deepdog/compare/1.2.0...1.2.1) (2024-05-12)
 
 ## [1.2.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.1.0...1.2.0) (2024-05-09)
