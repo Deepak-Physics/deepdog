@@ -358,8 +358,8 @@ class SubsetSimulation:
 		_logger.info(
 			f"final threshold cost: {threshold_cost}, at P = (1 / {self.n_s})^{self.m_max + 1}"
 		)
-		for a in all_chains[-10:]:
-			_logger.info(a)
+		# for a in all_chains[-10:]:
+		# 	_logger.info(a)
 		# for prob, prob_cost in probs_list:
 		# 	_logger.info(f"\t{prob}: {prob_cost}")
 		probs_list.sort(key=lambda c: c[0], reverse=True)
@@ -519,11 +519,11 @@ def coalesce_ss_results(
 		]
 	)
 
-	_logger.warning(estimated_likelihoods)
+	_logger.info(estimated_likelihoods)
 	geometric_mean_estimated_likelihoods = numpy.exp(
 		numpy.log(estimated_likelihoods).mean()
 	)
-	_logger.warning(geometric_mean_estimated_likelihoods)
+	_logger.info(geometric_mean_estimated_likelihoods)
 	arithmetic_mean_estimated_likelihoods = estimated_likelihoods.mean()
 
 	result = MultiSubsetSimulationResult(
