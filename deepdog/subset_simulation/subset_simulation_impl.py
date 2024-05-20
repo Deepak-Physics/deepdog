@@ -84,10 +84,16 @@ class SubsetSimulation:
 		self.mcmc_seed = mcmc_seed
 
 		self.use_adaptive_steps = use_adaptive_steps
-		self.default_phi_step = default_phi_step
+		self.default_phi_step = (
+			default_phi_step * 1.73
+		)  # this is a hack to fix a missing sqrt 3 in the proposal function code.
 		self.default_theta_step = default_theta_step
-		self.default_r_step = default_r_step
-		self.default_w_log_step = default_w_log_step
+		self.default_r_step = (
+			default_r_step * 1.73
+		)  # this is a hack to fix a missing sqrt 3 in the proposal function code.
+		self.default_w_log_step = (
+			default_w_log_step * 1.73
+		)  # this is a hack to fix a missing sqrt 3 in the proposal function code.
 		self.default_upper_w_log_step = default_upper_w_log_step
 
 		_logger.info("using params:")
