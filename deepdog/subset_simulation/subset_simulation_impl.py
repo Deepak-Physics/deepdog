@@ -476,7 +476,7 @@ class MultiSubsetSimulations:
 
 	def execute(self) -> Sequence[MultiSubsetSimulationResult]:
 		output: List[MultiSubsetSimulationResult] = []
-		for model_name_pair in self.model_name_pairs:
+		for model_index, model_name_pair in enumerate(self.model_name_pairs):
 			ss_results = [
 				SubsetSimulation(
 					model_name_pair,
@@ -485,8 +485,9 @@ class MultiSubsetSimulations:
 					self.n_s,
 					self.m_max,
 					self.target_cost,
-					level_0_seed=[run_index, self.level_0_seed_seed],
-					mcmc_seed=[run_index, self.mcmc_seed_seed],
+					num_initial_dmc_gens=self.num_dmc_gens,
+					level_0_seed=[model_index, run_index, self.level_0_seed_seed],
+					mcmc_seed=[model_index, run_index, self.mcmc_seed_seed],
 					use_adaptive_steps=self.use_adaptive_steps,
 					default_phi_step=self.default_phi_step,
 					default_theta_step=self.default_theta_step,
