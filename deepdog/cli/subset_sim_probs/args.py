@@ -14,7 +14,7 @@ def parse_args() -> argparse.Namespace:
 		description="Calculating probability from finished subset sim run",
 	)
 	parser.add_argument(
-		"--log_file",
+		"--log-file",
 		type=str,
 		help="A filename for logging to, if not provided will only log to stderr",
 		default=None,
