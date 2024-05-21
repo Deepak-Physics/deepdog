@@ -34,9 +34,13 @@ def build_model_dict(
 				calculation_dict[calculation_key] = {
 					"_model_key_dict": model_result.parsed_model_keys,
 					"_calculation_key_dict": out.data,
-					"num_finished_runs": int(model_result.result_dict["num_finished_runs"]),
+					"num_finished_runs": int(
+						model_result.result_dict["num_finished_runs"]
+					),
 					"num_runs": int(model_result.result_dict["num_runs"]),
-					"estimated_likelihood": float(model_result.result_dict["estimated_likelihood"]),
+					"estimated_likelihood": float(
+						model_result.result_dict["estimated_likelihood"]
+					),
 				}
 			else:
 				raise ValueError(
@@ -44,7 +48,6 @@ def build_model_dict(
 				)
 
 	return model_dict
-
 
 
 def coalesced_dict(
@@ -76,7 +79,6 @@ def coalesced_dict(
 			else:
 				_logger.error(f"We shouldn't be here! Double key for {model_key=}")
 				raise ValueError()
-
 
 	# second pass do probability calculation
 
@@ -114,7 +116,9 @@ def write_coalesced_dict(
 	_logger.info(f"Detected model field names {model_field_names}")
 
 	collected_fieldnames = list(model_field_names)
-	collected_fieldnames.extend(["calculations_coalesced", "num_finished_runs", "num_runs", "prob"])
+	collected_fieldnames.extend(
+		["calculations_coalesced", "num_finished_runs", "num_runs", "prob"]
+	)
 	with open(coalesced_output_filename, "w", newline="") as coalesced_output_file:
 		writer = csv.DictWriter(coalesced_output_file, fieldnames=collected_fieldnames)
 		writer.writeheader()

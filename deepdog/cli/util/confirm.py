@@ -8,12 +8,12 @@ _RESPONSE_MAP = {
 	"n": False,
 	"nope": False,
 	"true": True,
-	"false": False
+	"false": False,
 }
 
+
 def confirm_prompt(question: str) -> bool:
-	""" Prompt with the question and returns yes or no based on response.
-	"""
+	"""Prompt with the question and returns yes or no based on response."""
 	prompt = question + " [y/n]: "
 
 	while True:
@@ -22,4 +22,4 @@ def confirm_prompt(question: str) -> bool:
 		if choice in _RESPONSE_MAP:
 			return _RESPONSE_MAP[choice]
 		else:
-			print(f"Respond with \"yes\" or \"no\"")
+			print(f'Respond with "yes" or "no"')

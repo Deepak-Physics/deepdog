@@ -42,11 +42,11 @@ def parse_args() -> argparse.Namespace:
 	confirm_outfile_overwrite_group.add_argument(
 		"--never-overwrite-outfile",
 		action="store_true",
-		help="If a duplicate outfile is detected, skip confirmation and automatically exit early"
+		help="If a duplicate outfile is detected, skip confirmation and automatically exit early",
 	)
 	confirm_outfile_overwrite_group.add_argument(
 		"--force-overwrite-outfile",
 		action="store_true",
-		help="Skips checking for duplicate outfiles and overwrites"
+		help="Skips checking for duplicate outfiles and overwrites",
 	)
 	return parser.parse_args()

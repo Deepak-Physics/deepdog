@@ -45,19 +45,24 @@ def main(args: argparse.Namespace):
 		if "outfile" in args and args.outfile:
 			if os.path.exists(args.outfile):
 				if args.never_overwrite_outfile:
-					_logger.warning(f"Filename {args.outfile} already exists, and never want overwrite, so aborting.")
+					_logger.warning(
+						f"Filename {args.outfile} already exists, and never want overwrite, so aborting."
+					)
 					return
 				elif args.force_overwrite_outfile:
 					_logger.warning(f"Forcing overwrite of {args.outfile}")
 				else:
 					# need to confirm
-					confirm_overwrite = deepdog.cli.util.confirm_prompt(f"Filename {args.outfile} exists, overwrite?")
+					confirm_overwrite = deepdog.cli.util.confirm_prompt(
+						f"Filename {args.outfile} exists, overwrite?"
+					)
 					if not confirm_overwrite:
-						_logger.warning(f"Filename {args.outfile} already exists and do not want overwrite, aborting.")
+						_logger.warning(
+							f"Filename {args.outfile} already exists and do not want overwrite, aborting."
+						)
 						return
 					else:
 						_logger.warning(f"Overwriting file {args.outfile}")
-
 
 		indexifier = None
 		if args.indexify_json:
@@ -73,7 +78,9 @@ def main(args: argparse.Namespace):
 				indexifier = deepdog.indexify.Indexifier(indexify_data)
 
 		results_dir = pathlib.Path(args.results_directory)
-		out_files = [f for f in results_dir.iterdir() if f.name.endswith("subsetsim.csv")]
+		out_files = [
+			f for f in results_dir.iterdir() if f.name.endswith("subsetsim.csv")
+		]
 		_logger.info(
 			f"Reading {len(out_files)} subsetsim.csv files in directory {args.results_directory}"
 		)
