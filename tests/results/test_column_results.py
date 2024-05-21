@@ -1,4 +1,4 @@
-import deepdog.results
+import deepdog.results.read_csv
 
 
 def test_parse_groupdict():
@@ -6,9 +6,9 @@ def test_parse_groupdict():
 		"geom_-20_20_-10_10_0_5-orientation_free-dipole_count_100_success"
 	)
 
-	parsed = deepdog.results._parse_bayesrun_column(example_column_name)
+	parsed = deepdog.results.read_csv._parse_bayesrun_column(example_column_name)
 	assert parsed is not None
-	expected = deepdog.results.BayesrunColumnParsed(
+	expected = deepdog.results.read_csv.BayesrunColumnParsed(
 		{
 			"xmin": "-20",
 			"xmax": "20",
@@ -29,9 +29,9 @@ def test_parse_groupdict_with_magnitude():
 		"geom_-20_20_-10_10_0_5-magnitude_3.5-orientation_free-dipole_count_100_success"
 	)
 
-	parsed = deepdog.results._parse_bayesrun_column(example_column_name)
+	parsed = deepdog.results.read_csv._parse_bayesrun_column(example_column_name)
 	assert parsed is not None
-	expected = deepdog.results.BayesrunColumnParsed(
+	expected = deepdog.results.read_csv.BayesrunColumnParsed(
 		{
 			"xmin": "-20",
 			"xmax": "20",
