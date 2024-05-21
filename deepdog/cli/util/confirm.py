@@ -1,5 +1,3 @@
-import sys
-
 _RESPONSE_MAP = {
 	"yes": True,
 	"ye": True,
@@ -22,4 +20,4 @@ def confirm_prompt(question: str) -> bool:
 		if choice in _RESPONSE_MAP:
 			return _RESPONSE_MAP[choice]
 		else:
-			print(f'Respond with "yes" or "no"')
+			print('Respond with "yes" or "no"')
