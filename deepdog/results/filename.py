@@ -8,6 +8,7 @@ FILE_SLUG_REGEXES = [
 		r"(?P<tag>\w+)-(?P<job_index>\d+)",
 		r"mock_tarucha-(?P<job_index>\d+)",
 		r"(?:(?P<mock>mock)_)?tarucha(?:_(?P<tarucha_run_id>\d+))?-(?P<job_index>\d+)",
+		r"(?P<tag>\w+)-(?P<included_dots>[\w,]+)-(?P<target_cost>\d*\.?\d+)-(?P<job_index>\d+)",
 	]
 ]
 
