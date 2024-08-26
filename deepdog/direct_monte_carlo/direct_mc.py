@@ -267,14 +267,20 @@ class DirectMonteCarloRun:
 
 					seeds = seed_sequence.spawn(self.config.monte_carlo_cycles)
 
-					raw_pool_results = list(pool.imap_unordered(
-						self._wrapped_single_run,
-						[
-							(model_name_pair, seed, self.config.write_successes_to_file)
-							for seed in seeds
-						],
-						self.config.chunk_size,
-					))
+					raw_pool_results = list(
+						pool.imap_unordered(
+							self._wrapped_single_run,
+							[
+								(
+									model_name_pair,
+									seed,
+									self.config.write_successes_to_file,
+								)
+								for seed in seeds
+							],
+							self.config.chunk_size,
+						)
+					)
 
 					pool_results = sum(result[0] for result in raw_pool_results)
 
@@ -283,7 +289,7 @@ class DirectMonteCarloRun:
 							[result[1] for result in raw_pool_results]
 						)
 						if len(cycle_success_configs):
-								
+
 							sorted_by_freq = numpy.array(
 								[
 									pdme.subspace_simulation.sort_array_of_dipoles_by_frequency(
@@ -300,11 +306,13 @@ class DirectMonteCarloRun:
 							for n in range(dipole_count):
 								numpy.savetxt(
 									f"{self.config.tag}_{step_count}_dipole_{n}.csv",
-									sorted_by_freq[:: number_dipoles_to_write, n],
+									sorted_by_freq[::number_dipoles_to_write, n],
 									delimiter=",",
-							)
+								)
 						else:
-							_logger.debug("Instructed to write results, but none obtained")
+							_logger.debug(
+								"Instructed to write results, but none obtained"
+							)
 
 					_logger.debug(f"Pool results: {pool_results}")
 
