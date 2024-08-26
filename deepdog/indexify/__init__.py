@@ -36,6 +36,10 @@ class Indexifier:
 	def indexify(self, n: int) -> typing.Dict[str, typing.Any]:
 		return self.product_dict[n]
 
+	def __len__(self) -> int:
+		weights = [len(v) for v in self.dict.values()]
+		return math.prod(weights)
+
 	def _indexify_indices(self, n: int) -> typing.Sequence[int]:
 		"""
 		legacy indexify from old scripts, copypast.
