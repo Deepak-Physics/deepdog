@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.3.0...1.4.0) (2024-09-04)
+
+
+### Features
+
+* add subset sim probs command for bayes for subset simulation results ([c881da2](https://gitea.deepak.science:2222/physics/deepdog/commit/c881da28370a1e51d062e1a7edaa62af6eb98d0a))
+* allows some betetr matching for single_dipole runs ([5425ce1](https://gitea.deepak.science:2222/physics/deepdog/commit/5425ce1362919af4cc4dbd5813df3be8d877b198))
+* indexifier now has len ([d962ecb](https://gitea.deepak.science:2222/physics/deepdog/commit/d962ecb11e929de1d9aa458b5d8e82270eff0039))
+
+
+### Bug Fixes
+
+* update log file arg names in cli scripts ([6a5c593](https://gitea.deepak.science:2222/physics/deepdog/commit/6a5c5931d4fc849d0d6a0f2b971523a0f039d559))
+
 ## [1.3.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.2.1...1.3.0) (2024-05-20)
 
 
