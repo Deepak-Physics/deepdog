@@ -301,7 +301,7 @@ class DirectMonteCarloRun:
 							dipole_count = numpy.array(cycle_success_configs).shape[1]
 
 							number_dipoles_to_write = self.config.target_success * 5
-							_logger.info(f"Limiting to {number_dipoles_to_write=}")
+							_logger.info(f"Limiting to {number_dipoles_to_write=}, have {dipole_count}")
 
 							for n in range(dipole_count):
 								numpy.savetxt(
