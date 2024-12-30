@@ -287,7 +287,7 @@ class DirectMonteCarloRun:
 					_logger.debug(f"Pool results: {pool_results}")
 
 					if self.config.write_successes_to_file:
-	
+
 						_logger.info("Writing dipole results")
 
 						cycle_success_configs = numpy.concatenate(
@@ -301,23 +301,27 @@ class DirectMonteCarloRun:
 							f"Limiting to {max_number_dipoles_to_write=}, have {len(cycle_success_configs)}"
 						)
 
-
 						if len(cycle_success_configs):
 							sorted_by_freq = numpy.array(
 								[
 									pdme.subspace_simulation.sort_array_of_dipoles_by_frequency(
 										dipole_config
 									)
-									for dipole_config in cycle_success_configs[:max_number_dipoles_to_write]
+									for dipole_config in cycle_success_configs[
+										:max_number_dipoles_to_write
+									]
 								]
 							)
 
-
 							for n in range(dipole_count):
-								
-								dipole_filename = f"{self.config.tag}_{step_count}_dipole_{n}.csv"
-								_logger.debug(f"Writing {min(len(cycle_success_configs), max_number_dipoles_to_write)} to {dipole_filename}")
-								
+
+								dipole_filename = (
+									f"{self.config.tag}_{step_count}_dipole_{n}.csv"
+								)
+								_logger.debug(
+									f"Writing {min(len(cycle_success_configs), max_number_dipoles_to_write)} to {dipole_filename}"
+								)
+
 								numpy.savetxt(
 									dipole_filename,
 									sorted_by_freq[:, n],
