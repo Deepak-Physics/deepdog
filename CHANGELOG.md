@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.4.0...1.5.0) (2024-12-30)
+
+
+### Features
+
+* add configurable max number of dipoles to write ([a1b59cd](https://gitea.deepak.science:2222/physics/deepdog/commit/a1b59cd18b30359328a09210d9393f211aab30c2))
+* add configurable max number of dipoles to write ([53f8993](https://gitea.deepak.science:2222/physics/deepdog/commit/53f8993f2b155228fff5cbee84f10c62eb149a1f))
+
 ## [1.4.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.3.0...1.4.0) (2024-09-04)
 
 
