@@ -19,6 +19,11 @@ FILENAME_REGEX = re.compile(
 	r"(?P<timestamp>\d{8}-\d{6})-(?P<filename_slug>.*)\.realdata\.fast_filter\.bayesrun\.csv"
 )
 
+# probably a better way but who cares
+NO_TIMESTAMP_FILENAME_REGEX = re.compile(
+	r"(?P<filename_slug>.*)\.realdata\.fast_filter\.bayesrun\.csv"
+)
+
 
 SUBSET_SIM_FILENAME_REGEX = re.compile(
 	r"(?P<filename_slug>.*)-(?:no_adaptive_steps_)?(?P<num_ss_runs>\d+)-nc_(?P<n_c>\d+)-ns_(?P<n_s>\d+)-mmax_(?P<mmax>\d+)\.multi\.subsetsim\.csv"
@@ -46,15 +51,23 @@ class GeneralOutput:
 	results: typing.Sequence[GeneralModelResult]
 
 
+def _parse_string_output_filename(
+	filename: str,
+) -> typing.Tuple[typing.Optional[str], str]:
+	if match := FILENAME_REGEX.match(filename):
+		groups = match.groupdict()
+		return (groups["timestamp"], groups["filename_slug"])
+	elif match := NO_TIMESTAMP_FILENAME_REGEX.match(filename):
+		groups = match.groupdict()
+		return (None, groups["filename_slug"])
+	else:
+		raise ValueError(f"Could not parse {filename} as a bayesrun output filename")
+
+
 def _parse_output_filename(file: pathlib.Path) -> BayesrunOutputFilename:
 	filename = file.name
-	match = FILENAME_REGEX.match(filename)
-	if not match:
-		raise ValueError(f"{filename} was not a valid bayesrun output")
-	groups = match.groupdict()
-	return BayesrunOutputFilename(
-		timestamp=groups["timestamp"], filename_slug=groups["filename_slug"], path=file
-	)
+	timestamp, slug = _parse_string_output_filename(filename)
+	return BayesrunOutputFilename(timestamp=timestamp, filename_slug=slug, path=file)
 
 
 def _parse_ss_output_filename(file: pathlib.Path) -> BayesrunOutputFilename:
