@@ -1,3 +1,5 @@
+import re
+import pathlib
 import csv
 import pdme.model
 import pdme.measurement
@@ -36,9 +38,35 @@ class DirectMonteCarloConfig:
 	tag: str = ""
 	cap_core_count: int = 0  # 0 means cap at num cores - 1
 	chunk_size: int = 50
+	# chunk size of some kind
 	write_bayesrun_file: bool = True
 	bayesrun_file_timestamp: bool = True
-	# chunk size of some kind
+	skip_if_exists: bool = False
+
+	def get_filename(self) -> str:
+		"""
+		Generate a filename for the output of this run.
+		"""
+		# set starting execution timestamp
+		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+
+		if self.bayesrun_file_timestamp:
+			timestamp_str = f"{timestamp}-"
+		else:
+			timestamp_str = ""
+		filename = f"{timestamp_str}{self.tag}.realdata.fast_filter.bayesrun.csv"
+		_logger.debug(f"Got filename {filename}")
+		return filename
+
+	def get_filename_regex(self) -> str:
+		"""
+		Generate a regex for the output of this run.
+		"""
+
+		# having both timestamp and the hyphen separately optional is a bit of a hack
+		# too loose, but will never matter
+		pattern = rf"(?P<timestamp>\d{{8}}-\d{{6}})?-?{self.tag}\.realdata\.fast_filter\.bayesrun\.csv"
+		return pattern
 
 
 # Aliasing dict as a generic data container
@@ -230,8 +258,27 @@ class DirectMonteCarloRun:
 
 	def execute(self) -> Sequence[DirectMonteCarloResult]:
 
-		# set starting execution timestamp
-		timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+		filename = self.config.get_filename()
+		if self.config.skip_if_exists:
+			_logger.info(f"Checking if {filename} exists")
+			cwd = pathlib.Path.cwd()
+			if (cwd / filename).exists():
+				_logger.info(f"File {filename} exists, skipping")
+				return []
+			if self.config.bayesrun_file_timestamp:
+				_logger.info(
+					"Also need to check file endings because of possible past or current timestamps, check only occurs if writing timestamp is set"
+				)
+				pattern = self.config.get_filename_regex()
+				for file in cwd.iterdir():
+					match = re.match(pattern, file.name)
+					if match is not None:
+						_logger.info(f"Matched {file.name} to {pattern}")
+						_logger.info(f"File {filename} exists, skipping")
+						return []
+				_logger.info(
+					f"Finished checking against pattern {pattern}, hopefully didn't take too long!"
+				)
 
 		count_per_step = (
 			self.config.monte_carlo_count_per_cycle * self.config.monte_carlo_cycles
@@ -348,14 +395,6 @@ class DirectMonteCarloRun:
 				)
 
 		if self.config.write_bayesrun_file:
-
-			if self.config.bayesrun_file_timestamp:
-				timestamp_str = f"{timestamp}-"
-			else:
-				timestamp_str = ""
-			filename = (
-				f"{timestamp_str}{self.config.tag}.realdata.fast_filter.bayesrun.csv"
-			)
 
 			_logger.info(f"Going to write to file [{filename}]")
 			# row: Dict[str, Union[int, float, str]] = {}
