@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.6.0...1.7.0) (2025-02-27)
+
+
+### Features
+
+* adds configurable skip if file exists ([24c6e31](https://gitea.deepak.science:2222/physics/deepdog/commit/24c6e311c1d3067eb98cc60e6ca38d76373bf08e))
+
 ## [1.6.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.5.0...1.6.0) (2025-02-27)
 
 
