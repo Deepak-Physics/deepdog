@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.5.0...1.6.0) (2025-02-27)
+
+
+### Features
+
+* Adds ability to parse bayesruns without timestamps ([46f6b6c](https://gitea.deepak.science:2222/physics/deepdog/commit/46f6b6cdf15c67aedf0c871d201b8db320bccbdf))
+* allows negative log magnitude strings in models ([c8435b4](https://gitea.deepak.science:2222/physics/deepdog/commit/c8435b4b2a6e4b89030f53b5734eb743e2003fb7))
+
 ## [1.5.0](https://gitea.deepak.science:2222/physics/deepdog/compare/1.4.0...1.5.0) (2024-12-30)
 
 
