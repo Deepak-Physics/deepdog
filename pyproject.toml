@@ -18,7 +18,7 @@ pytest-cov = "^4.1.0"
 mypy = "^0.971"
 python-semantic-release = "^7.24.0"
 black = "^22.3.0"
-syrupy = "^4.0.8"
+syrupy = "^5.0.0"
 
 [tool.poetry.scripts]
 probs = "deepdog.cli.probs:wrapped_main"
